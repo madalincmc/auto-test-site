@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <nav aria-label="Breadcrumb" class="small" style="margin-bottom:14px" id="breadcrumb">
+      <a href="shop.html" id="back-to-products" data-testid="back-to-products">← Back to products</a>
+    </nav>
+
+    <div id="not-found" class="card empty-state hidden" data-testid="product-not-found">
+      <div class="empty-icon">🤷</div>
+      <h2>Product not found</h2>
+      <p>The product you're looking for doesn't exist.</p>
+      <a class="btn btn-primary" href="shop.html">Browse products</a>
+    </div>
+
+    <div id="product-detail" class="grid grid-2 hidden" data-testid="product-detail">
+      <div id="product-image-wrap"></div>
+      <div class="card">
+        <span class="muted small" id="product-category"></span>
+        <h1 id="product-title" data-testid="product-title"></h1>
+        <div class="rating" id="product-rating"></div>
+        <p class="product-price" style="font-size:1.6rem" id="product-price" data-testid="product-price"></p>
+        <p id="product-description" data-testid="product-description"></p>
+        <p id="stock-status" data-testid="stock-status"></p>
+
+        <form id="add-form" novalidate>
+          <div class="form-group hidden" id="size-group">
+            <label for="size-select">Size</label>
+            <select id="size-select" name="size" data-testid="size-select" style="max-width:200px"></select>
+            <div class="field-error" id="size-error"></div>
+          </div>
+          <div class="form-group hidden" id="color-group">
+            <span class="form-label" id="color-label">Colour: <span id="selected-color" data-testid="selected-color"></span></span>
+            <div class="row" id="color-swatches" role="group" aria-labelledby="color-label"></div>
+          </div>
+          <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <div class="qty-stepper">
+              <button type="button" id="qty-decrease" aria-label="Decrease quantity" data-testid="qty-decrease">−</button>
+              <input type="number" id="quantity" name="quantity" value="1" min="1" data-testid="quantity">
+              <button type="button" id="qty-increase" aria-label="Increase quantity" data-testid="qty-increase">+</button>
+            </div>
+            <div class="field-error" id="quantity-error"></div>
+          </div>
+          <div class="row">
+            <button type="submit" class="btn btn-primary btn-lg" id="add-to-cart" data-testid="add-to-cart">Add to cart</button>
+            <a href="cart.html" class="btn btn-lg" id="go-to-cart">View cart</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card hidden" id="product-extra" style="margin-top:20px">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" aria-selected="true" id="tab-details" data-panel="details-panel">Details</button>
+        <button class="tab" role="tab" aria-selected="false" id="tab-reviews" data-panel="reviews-panel">Reviews</button>
+        <button class="tab" role="tab" aria-selected="false" id="tab-shipping" data-panel="shipping-panel">Shipping</button>
+      </div>
+      <div role="tabpanel" id="details-panel">
+        <dl class="details" id="spec-list"></dl>
+      </div>
+      <div role="tabpanel" id="reviews-panel" class="hidden">
+        <ul id="review-list" data-testid="review-list" style="padding-left:18px"></ul>
+        <form id="review-form" style="max-width:480px" novalidate>
+          <h3>Write a review</h3>
+          <div class="form-group">
+            <label for="review-rating">Rating</label>
+            <select id="review-rating" name="rating"><option value="">Choose…</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select>
+          </div>
+          <div class="form-group">
+            <label for="review-text">Review</label>
+            <textarea id="review-text" name="review" placeholder="What did you think?"></textarea>
+          </div>
+          <div class="field-error" id="review-error"></div>
+          <button type="submit" class="btn" id="submit-review">Submit review</button>
+        </form>
+      </div>
+      <div role="tabpanel" id="shipping-panel" class="hidden">
+        <p>Standard shipping is free on orders of $75 or more. Express and overnight options are available at checkout.</p>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, $$, money, escapeHtml, stars, Cart, toast, productImage, requireAuth, getProduct, param, Store } = QA;
+      const user = requireAuth();
+      if (!user) return;
+      const p = getProduct(param('id'));
+      if (!p) { $('#not-found').classList.remove('hidden'); return; }
+
+      document.title = p.name + ' | QA Automation Playground';
+      $('#product-detail').classList.remove('hidden');
+      $('#product-extra').classList.remove('hidden');
+      $('#product-image-wrap').innerHTML = productImage(p, 'large');
+      $('#product-category').textContent = p.category;
+      $('#product-title').textContent = p.name;
+      $('#product-rating').innerHTML = `${stars(p.rating)} <span class="muted small">${p.rating} (${p.reviews} reviews)</span>`;
+      $('#product-price').innerHTML = money(p.price) + (p.oldPrice ? `<span class="old-price">${money(p.oldPrice)}</span>` : '');
+      $('#product-description').textContent = p.description;
+      $('#product-detail').dataset.productId = p.id;
+
+      const stock = $('#stock-status');
+      if (p.stock === 0) { stock.innerHTML = '<span class="badge badge-danger">Out of stock</span>'; }
+      else if (p.stock <= 5) { stock.innerHTML = `<span class="badge badge-warning">Only ${p.stock} left!</span>`; }
+      else { stock.innerHTML = '<span class="badge badge-success">In stock</span>'; }
+
+      const qty = $('#quantity');
+      qty.max = Math.max(1, p.stock);
+      if (p.stock === 0) {
+        $('#add-to-cart').disabled = true;
+        $('#add-to-cart').textContent = 'Out of stock';
+        qty.disabled = true;
+        $('#qty-increase').disabled = true;
+        $('#qty-decrease').disabled = true;
+      }
+
+      if (p.sizes) {
+        $('#size-group').classList.remove('hidden');
+        const sel = $('#size-select');
+        sel.add(new Option('Select a size', ''));
+        p.sizes.forEach((s) => sel.add(new Option(s, s)));
+      }
+      let color = p.colors ? p.colors[0] : null;
+      if (p.colors) {
+        $('#color-group').classList.remove('hidden');
+        const swatchColors = { Black: '#222', White: '#fff', Blue: '#339af0', Silver: '#ced4da', Red: '#e03131', Navy: '#1c3d7a', Grey: '#868e96', Green: '#2f9e44', Purple: '#7048e8' };
+        $('#color-swatches').innerHTML = p.colors.map((c, i) =>
+          `<button type="button" class="swatch" style="background:${swatchColors[c] || '#ccc'}" data-color="${c}" id="color-${c.toLowerCase()}" aria-label="${c}" title="${c}" aria-pressed="${i === 0}"></button>`).join('');
+        $('#selected-color').textContent = color;
+        $('#color-swatches').addEventListener('click', (e) => {
+          const b = e.target.closest('.swatch');
+          if (!b) return;
+          color = b.dataset.color;
+          $$('.swatch').forEach((s) => s.setAttribute('aria-pressed', s === b));
+          $('#selected-color').textContent = color;
+        });
+      }
+
+      const clampQty = (v) => Math.min(Math.max(1, v || 1), Math.max(1, p.stock));
+      $('#qty-decrease').addEventListener('click', () => { qty.value = clampQty(Number(qty.value) - 1); });
+      $('#qty-increase').addEventListener('click', () => { qty.value = clampQty(Number(qty.value) + 1); });
+
+      $('#add-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        let ok = true;
+        $('#size-error').textContent = '';
+        $('#quantity-error').textContent = '';
+        if (p.sizes && !$('#size-select').value) { $('#size-error').textContent = 'Please select a size'; ok = false; }
+        const n = Number(qty.value);
+        if (!Number.isInteger(n) || n < 1) { $('#quantity-error').textContent = 'Quantity must be at least 1'; ok = false; }
+        else if (n > p.stock) { $('#quantity-error').textContent = `Only ${p.stock} items available`; ok = false; }
+        if (!ok) return;
+        if (user.behavior === 'problem' && p.id % 2 === 0) return;
+        Cart.add(p.id, n, { size: p.sizes ? $('#size-select').value : null, color });
+        toast(`${n} × "${p.name}" added to cart`, 'success');
+      });
+
+      // Tabs
+      $$('#product-extra .tab').forEach((t) => t.addEventListener('click', () => {
+        $$('#product-extra .tab').forEach((x) => {
+          x.setAttribute('aria-selected', x === t);
+          $('#' + x.dataset.panel).classList.toggle('hidden', x !== t);
+        });
+      }));
+
+      $('#spec-list').innerHTML = [
+        ['SKU', 'QA-' + String(p.id).padStart(4, '0')], ['Category', p.category], ['Price', money(p.price)],
+        ['Stock', p.stock], ['Sizes', p.sizes ? p.sizes.join(', ') : '—'], ['Colours', p.colors ? p.colors.join(', ') : '—']
+      ].map(([k, v]) => `<dt>${k}</dt><dd data-spec="${k.toLowerCase()}">${escapeHtml(v)}</dd>`).join('');
+
+      // Reviews (user-written ones are stored locally)
+      const reviewKey = 'qa_reviews_' + p.id;
+      const seed = [
+        { author: 'Alex', rating: 5, text: 'Exactly as described, would buy again.' },
+        { author: 'Jordan', rating: 4, text: 'Good value for the price.' }
+      ];
+      function renderReviews() {
+        const all = Store.get(reviewKey, []).concat(seed);
+        $('#review-list').innerHTML = all.map((r) =>
+          `<li class="review" style="margin-bottom:8px"><strong class="review-author">${escapeHtml(r.author)}</strong> <span class="rating">${stars(r.rating)}</span><br><span class="review-text">${escapeHtml(r.text)}</span></li>`).join('');
+        $('#tab-reviews').textContent = `Reviews (${all.length})`;
+      }
+      renderReviews();
+      $('#review-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const rating = Number($('#review-rating').value);
+        const text = $('#review-text').value.trim();
+        const err = $('#review-error');
+        if (!rating) { err.textContent = 'Please choose a rating'; return; }
+        if (text.length < 10) { err.textContent = 'Review must be at least 10 characters'; return; }
+        err.textContent = '';
+        const list = Store.get(reviewKey, []);
+        list.unshift({ author: user.firstName, rating, text });
+        Store.set(reviewKey, list);
+        e.target.reset();
+        renderReviews();
+        toast('Thanks for your review!', 'success');
+      });
+    })();
+  </script>
+</body>
+</html>

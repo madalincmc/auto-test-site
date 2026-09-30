@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <div class="card" style="margin-bottom:20px">
+      <div class="row" style="gap:20px">
+        <div class="avatar" id="avatar" data-testid="avatar"></div>
+        <div>
+          <h1 class="mb-0" id="profile-name" data-testid="profile-name"></h1>
+          <div class="muted">@<span id="profile-username" data-testid="profile-username"></span> · <span id="profile-email"></span></div>
+          <div class="row" style="margin-top:10px">
+            <label class="btn btn-sm" for="avatar-input" id="avatar-upload-label">📷 Upload photo</label>
+            <input type="file" id="avatar-input" name="avatar" accept="image/png, image/jpeg, image/gif" class="hidden" data-testid="avatar-input">
+            <button type="button" class="btn btn-sm btn-link" id="avatar-remove">Remove photo</button>
+          </div>
+          <div class="field-error" id="avatar-error"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tabs" role="tablist" id="profile-tabs">
+        <button class="tab" role="tab" id="tab-personal" aria-controls="panel-personal" aria-selected="true" data-tab="personal">Personal info</button>
+        <button class="tab" role="tab" id="tab-address" aria-controls="panel-address" aria-selected="false" data-tab="address">Address</button>
+        <button class="tab" role="tab" id="tab-security" aria-controls="panel-security" aria-selected="false" data-tab="security">Security</button>
+        <button class="tab" role="tab" id="tab-preferences" aria-controls="panel-preferences" aria-selected="false" data-tab="preferences">Preferences</button>
+        <button class="tab" role="tab" id="tab-account" aria-controls="panel-account" aria-selected="false" data-tab="account">Account</button>
+      </div>
+
+      <!-- Personal info -->
+      <section role="tabpanel" id="panel-personal" aria-labelledby="tab-personal">
+        <div id="personal-alert" class="alert hidden" role="alert"></div>
+        <form id="personal-form" novalidate data-testid="personal-form">
+          <fieldset id="personal-fieldset" disabled style="border:0;padding:0;margin:0">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="p-first-name">First name</label>
+                <input type="text" id="p-first-name" name="firstName" data-testid="profile-first-name">
+                <div class="field-error" id="p-first-name-error"></div>
+              </div>
+              <div class="form-group">
+                <label for="p-last-name">Last name</label>
+                <input type="text" id="p-last-name" name="lastName" data-testid="profile-last-name">
+                <div class="field-error" id="p-last-name-error"></div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="p-email">Email</label>
+                <input type="email" id="p-email" name="email" data-testid="profile-email">
+                <div class="field-error" id="p-email-error"></div>
+              </div>
+              <div class="form-group">
+                <label for="p-phone">Phone</label>
+                <input type="tel" id="p-phone" name="phone" placeholder="+1 555 0100" data-testid="profile-phone">
+                <div class="field-error" id="p-phone-error"></div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="p-dob">Date of birth</label>
+                <input type="date" id="p-dob" name="dob">
+              </div>
+              <div class="form-group">
+                <label for="p-gender">Gender</label>
+                <select id="p-gender" name="gender">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                  <option value="na">Prefer not to say</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="p-bio">Bio</label>
+              <textarea id="p-bio" name="bio" maxlength="200" data-testid="profile-bio"></textarea>
+              <div class="field-hint"><span id="bio-count">0</span>/200 characters</div>
+            </div>
+          </fieldset>
+          <div class="row">
+            <button type="button" class="btn btn-primary" id="edit-profile" data-testid="edit-profile">Edit profile</button>
+            <button type="submit" class="btn btn-success hidden" id="save-profile" data-testid="save-profile">Save changes</button>
+            <button type="button" class="btn hidden" id="cancel-edit" data-testid="cancel-edit">Cancel</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Address -->
+      <section role="tabpanel" id="panel-address" aria-labelledby="tab-address" class="hidden">
+        <form id="address-form" novalidate data-testid="address-form">
+          <div class="form-group">
+            <label for="a-street">Street address</label>
+            <input type="text" id="a-street" name="street" data-testid="address-street">
+            <div class="field-error" id="a-street-error"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="a-city">City</label>
+              <input type="text" id="a-city" name="city" data-testid="address-city">
+              <div class="field-error" id="a-city-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="a-state">State / Region</label>
+              <input type="text" id="a-state" name="state" data-testid="address-state">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="a-zip">ZIP / Postal code</label>
+              <input type="text" id="a-zip" name="zip" data-testid="address-zip">
+              <div class="field-error" id="a-zip-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="a-country">Country</label>
+              <select id="a-country" name="country" data-testid="address-country"></select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="save-address" data-testid="save-address">Save address</button>
+        </form>
+      </section>
+
+      <!-- Security -->
+      <section role="tabpanel" id="panel-security" aria-labelledby="tab-security" class="hidden">
+        <h3>Change password</h3>
+        <div id="password-alert" class="alert hidden" role="alert" data-testid="password-alert"></div>
+        <form id="password-form" novalidate style="max-width:420px" data-testid="password-form">
+          <div class="form-group">
+            <label for="current-password">Current password</label>
+            <input type="password" id="current-password" name="currentPassword" autocomplete="current-password">
+          </div>
+          <div class="form-group">
+            <label for="new-password">New password</label>
+            <input type="password" id="new-password" name="newPassword" autocomplete="new-password">
+            <div class="field-hint">At least 8 characters, with a number and a symbol.</div>
+          </div>
+          <div class="form-group">
+            <label for="confirm-new-password">Confirm new password</label>
+            <input type="password" id="confirm-new-password" name="confirmNewPassword" autocomplete="new-password">
+          </div>
+          <button type="submit" class="btn btn-primary" id="change-password" data-testid="change-password">Update password</button>
+        </form>
+        <hr>
+        <h3>Two-factor authentication</h3>
+        <label class="switch" for="two-factor"><input type="checkbox" id="two-factor" name="twoFactor" role="switch" data-testid="two-factor"><span class="slider"></span> <span id="two-factor-label">Disabled</span></label>
+      </section>
+
+      <!-- Preferences -->
+      <section role="tabpanel" id="panel-preferences" aria-labelledby="tab-preferences" class="hidden">
+        <form id="preferences-form" data-testid="preferences-form">
+          <div class="grid grid-2">
+            <fieldset>
+              <legend>Notifications</legend>
+              <label class="switch" style="margin-bottom:10px"><input type="checkbox" id="notify-email" name="notifyEmail" role="switch"><span class="slider"></span> Email notifications</label><br>
+              <label class="switch" style="margin-bottom:10px"><input type="checkbox" id="notify-sms" name="notifySms" role="switch"><span class="slider"></span> SMS notifications</label><br>
+              <label class="switch"><input type="checkbox" id="notify-push" name="notifyPush" role="switch"><span class="slider"></span> Push notifications</label>
+            </fieldset>
+            <fieldset>
+              <legend>Theme</legend>
+              <label class="check"><input type="radio" name="theme" value="light" id="theme-light"> Light</label>
+              <label class="check"><input type="radio" name="theme" value="dark" id="theme-dark"> Dark</label>
+              <label class="check"><input type="radio" name="theme" value="system" id="theme-system"> Use system setting</label>
+            </fieldset>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pref-language">Language</label>
+              <select id="pref-language" name="language">
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="ro">Română</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Newsletter</label>
+              <label class="check"><input type="checkbox" id="pref-newsletter" name="newsletter"> Send me product news and offers</label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="save-preferences" data-testid="save-preferences">Save preferences</button>
+          <span id="preferences-saved" class="badge badge-success hidden" data-testid="preferences-saved">Saved ✓</span>
+        </form>
+      </section>
+
+      <!-- Account -->
+      <section role="tabpanel" id="panel-account" aria-labelledby="tab-account" class="hidden">
+        <dl class="details" id="account-details">
+          <dt>Username</dt><dd id="acc-username"></dd>
+          <dt>Account status</dt><dd><span class="badge badge-success" id="acc-status">Active</span></dd>
+          <dt>Logged in at</dt><dd id="acc-login-time"></dd>
+          <dt>Orders placed</dt><dd id="acc-orders"></dd>
+        </dl>
+        <hr>
+        <h3 style="color:var(--danger)">Danger zone</h3>
+        <p class="muted">Resets your profile edits (name, address, avatar, preferences and password) back to the defaults.</p>
+        <button class="btn btn-outline-danger" id="reset-profile" data-testid="reset-profile">Reset profile</button>
+      </section>
+    </div>
+
+    <!-- Confirm modal -->
+    <div class="modal-backdrop" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <div class="modal">
+        <div class="modal-header"><h3 id="confirm-title">Reset profile?</h3><button class="modal-close" data-close aria-label="Close">×</button></div>
+        <div class="modal-body">This cannot be undone. Type <strong>RESET</strong> to confirm.
+          <input type="text" id="confirm-input" style="margin-top:10px" aria-label="Type RESET to confirm" data-testid="confirm-input">
+        </div>
+        <div class="modal-footer">
+          <button class="btn" data-close id="confirm-cancel">Cancel</button>
+          <button class="btn btn-danger" id="confirm-ok" disabled data-testid="confirm-ok">Reset profile</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, $$, requireAuth, currentUser, updateProfile, toast, Store, KEYS, Orders, escapeHtml } = QA;
+      if (!requireAuth()) return;
+
+      const countrySel = $('#a-country');
+      QA_DATA.countries.forEach((c) => countrySel.add(new Option(c.name, c.code)));
+
+      // ----- Tabs (with URL hash support, e.g. profile.html#address) -----
+      function selectTab(name) {
+        $$('#profile-tabs .tab').forEach((t) => {
+          const on = t.dataset.tab === name;
+          t.setAttribute('aria-selected', on);
+          $('#panel-' + t.dataset.tab).classList.toggle('hidden', !on);
+        });
+        history.replaceState(null, '', '#' + name);
+      }
+      $$('#profile-tabs .tab').forEach((t) => t.addEventListener('click', () => selectTab(t.dataset.tab)));
+      const hash = location.hash.slice(1);
+      if (['personal', 'address', 'security', 'preferences', 'account'].includes(hash)) selectTab(hash);
+
+      // ----- Render -----
+      function renderHeaderCard(u) {
+        $('#profile-name').textContent = u.firstName + ' ' + u.lastName;
+        $('#profile-username').textContent = u.username;
+        $('#profile-email').textContent = u.email;
+        const avatar = $('#avatar');
+        avatar.innerHTML = u.avatar
+          ? `<img src="${u.avatar}" alt="Profile photo" id="avatar-img">`
+          : escapeHtml((u.firstName[0] || '') + (u.lastName[0] || '')).toUpperCase();
+        $('#avatar-remove').classList.toggle('hidden', !u.avatar);
+        const hn = document.getElementById('header-username');
+        if (hn) hn.textContent = u.firstName || u.username;
+      }
+
+      function fillPersonal(u) {
+        $('#p-first-name').value = u.firstName || '';
+        $('#p-last-name').value = u.lastName || '';
+        $('#p-email').value = u.email || '';
+        $('#p-phone').value = u.phone || '';
+        $('#p-dob').value = u.dob || '';
+        $('#p-gender').value = u.gender || 'na';
+        $('#p-bio').value = u.bio || '';
+        $('#bio-count').textContent = $('#p-bio').value.length;
+      }
+      function fillAddress(u) {
+        $('#a-street').value = u.address.street || '';
+        $('#a-city').value = u.address.city || '';
+        $('#a-state').value = u.address.state || '';
+        $('#a-zip').value = u.address.zip || '';
+        $('#a-country').value = u.address.country || 'US';
+      }
+      function fillPreferences(u) {
+        const p = u.preferences;
+        $('#notify-email').checked = !!p.notifyEmail;
+        $('#notify-sms').checked = !!p.notifySms;
+        $('#notify-push').checked = !!p.notifyPush;
+        $('#pref-newsletter').checked = !!p.newsletter;
+        $('#pref-language').value = p.language || 'en';
+        ($('#theme-' + (p.theme || 'light')) || $('#theme-light')).checked = true;
+        $('#two-factor').checked = !!p.twoFactor;
+        $('#two-factor-label').textContent = p.twoFactor ? 'Enabled' : 'Disabled';
+      }
+      function fillAccount(u) {
+        const session = Store.get(KEYS.session, {});
+        $('#acc-username').textContent = u.username;
+        $('#acc-login-time').textContent = session.loggedInAt ? new Date(session.loggedInAt).toLocaleString() : '—';
+        $('#acc-orders').textContent = Orders.all().length;
+      }
+      function renderAll() {
+        const u = currentUser();
+        renderHeaderCard(u); fillPersonal(u); fillAddress(u); fillPreferences(u); fillAccount(u);
+      }
+      renderAll();
+
+      $('#p-bio').addEventListener('input', (e) => { $('#bio-count').textContent = e.target.value.length; });
+
+      // ----- Personal info edit mode -----
+      function setEditing(on) {
+        $('#personal-fieldset').disabled = !on;
+        $('#edit-profile').classList.toggle('hidden', on);
+        $('#save-profile').classList.toggle('hidden', !on);
+        $('#cancel-edit').classList.toggle('hidden', !on);
+        if (on) $('#p-first-name').focus();
+      }
+      function setError(id, msg) {
+        $('#' + id + '-error').textContent = msg;
+        $('#' + id).classList.toggle('is-invalid', !!msg);
+        return !msg;
+      }
+      $('#edit-profile').addEventListener('click', () => { $('#personal-alert').classList.add('hidden'); setEditing(true); });
+      $('#cancel-edit').addEventListener('click', () => {
+        fillPersonal(currentUser());
+        ['p-first-name', 'p-last-name', 'p-email', 'p-phone'].forEach((id) => setError(id, ''));
+        setEditing(false);
+      });
+
+      $('#personal-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const first = $('#p-first-name').value.trim();
+        const last = $('#p-last-name').value.trim();
+        const email = $('#p-email').value.trim();
+        const phone = $('#p-phone').value.trim();
+        const ok = [
+          setError('p-first-name', first ? '' : 'First name is required'),
+          setError('p-last-name', last ? '' : 'Last name is required'),
+          setError('p-email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? '' : 'Please enter a valid email address'),
+          setError('p-phone', !phone || /^\+?[\d\s()-]{7,20}$/.test(phone) ? '' : 'Please enter a valid phone number')
+        ].every(Boolean);
+        if (!ok) return;
+
+        const btn = $('#save-profile');
+        btn.disabled = true; btn.textContent = 'Saving…';
+        await QA.sleep(600);
+        btn.disabled = false; btn.textContent = 'Save changes';
+
+        const alertBox = $('#personal-alert');
+        const u = currentUser();
+        if (u.behavior === 'error') {
+          const n = Number(sessionStorage.getItem('qa_error_saves') || 0) + 1;
+          sessionStorage.setItem('qa_error_saves', n);
+          if (n % 2 === 1) {
+            alertBox.className = 'alert alert-error';
+            alertBox.textContent = 'Server error (500): Could not save your profile. Please try again.';
+            return;
+          }
+        }
+        updateProfile(u.username, {
+          firstName: first, lastName: last, email, phone,
+          dob: $('#p-dob').value, gender: $('#p-gender').value, bio: $('#p-bio').value.trim()
+        });
+        alertBox.className = 'alert alert-success';
+        alertBox.textContent = 'Your profile has been updated successfully.';
+        setEditing(false);
+        renderHeaderCard(currentUser());
+        toast('Profile saved', 'success');
+      });
+
+      // ----- Address -----
+      $('#address-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const street = $('#a-street').value.trim();
+        const city = $('#a-city').value.trim();
+        const zip = $('#a-zip').value.trim();
+        const ok = [
+          setError('a-street', street ? '' : 'Street address is required'),
+          setError('a-city', city ? '' : 'City is required'),
+          setError('a-zip', /^[A-Za-z0-9 -]{3,10}$/.test(zip) ? '' : 'Please enter a valid postal code')
+        ].every(Boolean);
+        if (!ok) return;
+        updateProfile(currentUser().username, {
+          address: { street, city, state: $('#a-state').value.trim(), zip, country: $('#a-country').value }
+        });
+        toast('Address saved', 'success');
+      });
+
+      // ----- Password -----
+      $('#password-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const u = currentUser();
+        const cur = $('#current-password').value;
+        const next = $('#new-password').value;
+        const confirm = $('#confirm-new-password').value;
+        const box = $('#password-alert');
+        let msg = '';
+        if (!cur || !next || !confirm) msg = 'All password fields are required.';
+        else if (cur !== u.password) msg = 'Current password is incorrect.';
+        else if (next.length < 8 || !/\d/.test(next) || !/[^A-Za-z0-9]/.test(next)) msg = 'New password must be at least 8 characters and contain a number and a symbol.';
+        else if (next === cur) msg = 'New password must be different from the current password.';
+        else if (next !== confirm) msg = 'New passwords do not match.';
+        box.className = 'alert ' + (msg ? 'alert-error' : 'alert-success');
+        if (msg) { box.textContent = msg; return; }
+        updateProfile(u.username, { password: next });
+        box.textContent = 'Password updated. Use your new password next time you log in.';
+        e.target.reset();
+      });
+
+      $('#two-factor').addEventListener('change', (e) => {
+        updateProfile(currentUser().username, { preferences: { twoFactor: e.target.checked } });
+        $('#two-factor-label').textContent = e.target.checked ? 'Enabled' : 'Disabled';
+        toast('Two-factor authentication ' + (e.target.checked ? 'enabled' : 'disabled'));
+      });
+
+      // ----- Preferences -----
+      $('#preferences-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        updateProfile(currentUser().username, {
+          preferences: {
+            notifyEmail: $('#notify-email').checked,
+            notifySms: $('#notify-sms').checked,
+            notifyPush: $('#notify-push').checked,
+            newsletter: $('#pref-newsletter').checked,
+            language: $('#pref-language').value,
+            theme: (document.querySelector('input[name="theme"]:checked') || {}).value || 'light'
+          }
+        });
+        const badge = $('#preferences-saved');
+        badge.classList.remove('hidden');
+        setTimeout(() => badge.classList.add('hidden'), 2500);
+      });
+
+      // ----- Avatar -----
+      $('#avatar-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        const err = $('#avatar-error');
+        err.textContent = '';
+        if (!file) return;
+        if (!/^image\/(png|jpeg|gif)$/.test(file.type)) { err.textContent = 'Only PNG, JPG or GIF images are allowed.'; return; }
+        if (file.size > 1024 * 1024) { err.textContent = 'Image must be smaller than 1 MB.'; return; }
+        const reader = new FileReader();
+        reader.onload = () => {
+          updateProfile(currentUser().username, { avatar: reader.result });
+          renderHeaderCard(currentUser());
+          toast('Profile photo updated', 'success');
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+      });
+      $('#avatar-remove').addEventListener('click', () => {
+        updateProfile(currentUser().username, { avatar: null });
+        renderHeaderCard(currentUser());
+      });
+
+      // ----- Reset profile (modal) -----
+      const modal = $('#confirm-modal');
+      const closeModal = () => { modal.classList.remove('open'); $('#confirm-input').value = ''; $('#confirm-ok').disabled = true; };
+      $('#reset-profile').addEventListener('click', () => { modal.classList.add('open'); $('#confirm-input').focus(); });
+      $$('[data-close]', modal).forEach((b) => b.addEventListener('click', closeModal));
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('open')) closeModal(); });
+      $('#confirm-input').addEventListener('input', (e) => { $('#confirm-ok').disabled = e.target.value !== 'RESET'; });
+      $('#confirm-ok').addEventListener('click', () => {
+        const profiles = Store.get(KEYS.profiles, {});
+        delete profiles[currentUser().username];
+        Store.set(KEYS.profiles, profiles);
+        closeModal();
+        renderAll();
+        toast('Profile reset to defaults', 'success');
+      });
+    })();
+  </script>
+</body>
+</html>

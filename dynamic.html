@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic &amp; Waits | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <div class="page-header">
+      <h1>Dynamic content &amp; waits</h1>
+      <p>Elements that appear late, change, move or disappear. Avoid hard sleeps — use explicit waits.</p>
+    </div>
+    <nav class="toc" aria-label="On this page">
+      <a href="#delayed-loading">Delayed loading</a><a href="#enable-visible">Enable / visible after</a><a href="#dynamic-ids">Dynamic IDs</a>
+      <a href="#add-remove">Add / remove</a><a href="#disappearing">Disappearing</a><a href="#text-change">Changing text</a>
+      <a href="#progress">Progress bar</a><a href="#ajax">Simulated AJAX</a><a href="#notifications">Random notifications</a>
+      <a href="#random-order">Random order</a><a href="#infinite-scroll">Infinite scroll</a><a href="#moving-target">Moving target</a>
+    </nav>
+
+    <!-- ============ DELAYED LOADING ============ -->
+    <section class="section card" id="delayed-loading">
+      <h2>Delayed loading</h2>
+      <div class="grid grid-2">
+        <div class="demo-box">
+          <h3>Example 1: element hidden in the DOM</h3>
+          <p class="small muted">The result already exists but is hidden. Wait for visibility.</p>
+          <button class="btn btn-primary" id="start-hidden" data-testid="start-hidden">Start</button>
+          <div id="loading-hidden" class="hidden" style="margin-top:10px"><span class="spinner"></span> Loading…</div>
+          <h4 id="finish-hidden" class="hidden" style="margin-top:10px" data-testid="finish-hidden">Hello World!</h4>
+        </div>
+        <div class="demo-box">
+          <h3>Example 2: element rendered after load</h3>
+          <p class="small muted">The result does not exist until loading finishes. Wait for presence.</p>
+          <button class="btn btn-primary" id="start-rendered" data-testid="start-rendered">Start</button>
+          <div id="rendered-container" style="margin-top:10px"></div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <label for="delay-select" class="small">Delay:</label>
+        <select id="delay-select" style="width:auto"><option value="1000">1 second</option><option value="3000" selected>3 seconds</option><option value="5000">5 seconds</option><option value="10000">10 seconds</option></select>
+      </div>
+    </section>
+
+    <!-- ============ ENABLE / VISIBLE AFTER ============ -->
+    <section class="section card" id="enable-visible">
+      <h2>Enabled / visible after 5 seconds</h2>
+      <p class="section-desc">These change automatically 5 seconds after page load. Reload the page to retry.</p>
+      <div class="row">
+        <button class="btn btn-primary" id="enable-after" disabled data-testid="enable-after">Will enable in 5 seconds</button>
+        <button class="btn" id="visible-after" style="display:none" data-testid="visible-after">Visible after 5 seconds</button>
+        <button class="btn" id="color-change" style="color:var(--text)" data-testid="color-change">Colour changes</button>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <input type="text" id="enable-field" disabled placeholder="Disabled" style="max-width:260px">
+        <button class="btn" id="toggle-enable-field">Enable</button>
+        <span id="enable-field-status" class="small muted"></span>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <label class="check mb-0" id="checkbox-wrapper"><input type="checkbox" id="removable-checkbox"> A checkbox</label>
+        <button class="btn" id="toggle-checkbox" data-testid="toggle-checkbox">Remove</button>
+        <span id="checkbox-status" class="small muted"></span>
+      </div>
+    </section>
+
+    <!-- ============ DYNAMIC IDS ============ -->
+    <section class="section card" id="dynamic-ids">
+      <h2>Dynamic IDs &amp; classes</h2>
+      <p class="section-desc">IDs and classes are regenerated on every load. Don't rely on them — use text, role or stable attributes.</p>
+      <div class="row" id="dynamic-id-buttons"></div>
+      <p class="small" style="margin-top:10px">Clicked: <strong id="dynamic-id-result">—</strong></p>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="regenerate-ids">Regenerate IDs</button>
+      </div>
+    </section>
+
+    <!-- ============ ADD / REMOVE ============ -->
+    <section class="section card" id="add-remove">
+      <h2>Add / remove elements</h2>
+      <button class="btn btn-primary" id="add-element" data-testid="add-element">Add element</button>
+      <div class="row" id="elements-container" style="margin-top:12px" data-testid="elements-container"></div>
+      <p class="small">Count: <strong id="element-count">0</strong></p>
+    </section>
+
+    <!-- ============ DISAPPEARING ============ -->
+    <section class="section card" id="disappearing">
+      <h2>Disappearing elements</h2>
+      <p class="section-desc">Each load, the "Gallery" link may or may not be present (50% chance). Write a test that handles both.</p>
+      <ul class="row" id="disappearing-menu" style="list-style:none;padding:0">
+        <li><a class="btn" href="#disappearing">Home</a></li>
+        <li><a class="btn" href="#disappearing">About</a></li>
+        <li><a class="btn" href="#disappearing">Contact us</a></li>
+        <li><a class="btn" href="#disappearing">Portfolio</a></li>
+      </ul>
+      <div class="row">
+        <button class="btn" id="flash-btn" data-testid="flash-btn">Show message for 2 seconds</button>
+        <span id="flash-message" class="badge badge-success hidden" data-testid="flash-message">Now you see me!</span>
+      </div>
+    </section>
+
+    <!-- ============ TEXT CHANGE ============ -->
+    <section class="section card" id="text-change">
+      <h2>Changing text</h2>
+      <div class="grid grid-2">
+        <div>
+          <p>Status: <strong id="status-text" data-testid="status-text">Pending</strong></p>
+          <button class="btn" id="start-status" data-testid="start-status">Start process</button>
+          <p class="small muted">Goes Pending → Queued → Running → Completed over ~6 seconds.</p>
+        </div>
+        <div>
+          <p>Live clock: <strong id="live-clock" data-testid="live-clock"></strong></p>
+          <p>Counter: <strong id="live-counter" data-testid="live-counter">0</strong> <button class="btn btn-sm" id="counter-toggle">Start</button></p>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" id="stale-btn" data-testid="stale-btn">Re-render list (stale element)</button>
+        <ul id="stale-list" class="row" style="list-style:none;padding:0;margin:0"></ul>
+      </div>
+      <p class="small muted">Grab a reference to a list item, click Re-render, then use the old reference — classic StaleElementReferenceException.</p>
+    </section>
+
+    <!-- ============ PROGRESS ============ -->
+    <section class="section card" id="progress">
+      <h2>Progress bar</h2>
+      <p class="section-desc">Start the bar and stop it at exactly 75%.</p>
+      <div class="progress" style="margin-bottom:12px"><div class="progress-bar" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%" data-testid="progress-bar">0%</div></div>
+      <div class="row">
+        <button class="btn btn-primary" id="progress-start" data-testid="progress-start">Start</button>
+        <button class="btn" id="progress-stop" data-testid="progress-stop" disabled>Stop</button>
+        <button class="btn" id="progress-reset">Reset</button>
+        <span id="progress-result" class="small" data-testid="progress-result"></span>
+      </div>
+    </section>
+
+    <!-- ============ AJAX ============ -->
+    <section class="section card" id="ajax">
+      <h2>Simulated AJAX request</h2>
+      <p class="section-desc">Random 1-3 second response time. 20% of requests fail. Retry if needed.</p>
+      <button class="btn btn-primary" id="load-users" data-testid="load-users">Load users</button>
+      <div id="ajax-status" style="margin-top:12px" aria-live="polite"></div>
+      <div class="table-wrap">
+        <table class="table hidden" id="ajax-table" data-testid="ajax-table">
+          <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>City</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ NOTIFICATIONS ============ -->
+    <section class="section card" id="notifications">
+      <h2>Random notifications</h2>
+      <button class="btn" id="notify-btn" data-testid="notify-btn">Trigger action</button>
+      <div id="notification-area" style="margin-top:12px"></div>
+    </section>
+
+    <!-- ============ RANDOM ORDER ============ -->
+    <section class="section card" id="random-order">
+      <h2>Random order</h2>
+      <p class="section-desc">These items are shuffled on every load. Find "Mercury" regardless of position.</p>
+      <ul id="shuffled-list" class="row" style="list-style:none;padding:0"></ul>
+      <p class="small">Clicked: <strong id="shuffle-result">—</strong></p>
+    </section>
+
+    <!-- ============ INFINITE SCROLL ============ -->
+    <section class="section card" id="infinite-scroll">
+      <h2>Infinite scroll</h2>
+      <p class="section-desc">New items load as you scroll to the bottom of the box (max 100). Scroll until "Item 50" exists.</p>
+      <div class="scroll-box" id="infinite-box" style="height:260px" data-testid="infinite-box">
+        <ul id="infinite-list" style="list-style:none;padding:0;margin:0"></ul>
+        <div id="infinite-loader" class="small muted" style="padding:8px;text-align:center"><span class="spinner spinner-sm"></span> Loading more…</div>
+      </div>
+      <p class="small">Loaded: <strong id="infinite-count">0</strong> items</p>
+    </section>
+
+    <!-- ============ MOVING TARGET ============ -->
+    <section class="section card" id="moving-target">
+      <h2>Moving &amp; overlapped elements</h2>
+      <div class="grid grid-2">
+        <div>
+          <h3>Animated button</h3>
+          <div style="position:relative;height:60px;background:var(--surface-2);border-radius:6px;overflow:hidden">
+            <button class="btn btn-primary" id="moving-btn" style="position:absolute;top:10px;left:0" data-testid="moving-btn">Catch me</button>
+          </div>
+          <button class="btn btn-sm" id="animate-btn" style="margin-top:8px">Start animation</button>
+          <p class="small">Result: <strong id="moving-result">—</strong></p>
+        </div>
+        <div>
+          <h3>Overlay blocks click</h3>
+          <div style="position:relative;display:inline-block">
+            <button class="btn" id="covered-btn" data-testid="covered-btn">Covered button</button>
+            <div id="overlay" style="position:absolute;inset:-6px;background:rgba(28,35,51,.7);color:#fff;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:.8rem">Overlay (3s)</div>
+          </div>
+          <button class="btn btn-sm" id="show-overlay" style="margin-left:8px">Show overlay again</button>
+          <p class="small">Result: <strong id="covered-result">—</strong></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, $$, sleep } = QA;
+      const delay = () => Number($('#delay-select').value);
+      const rnd = () => Math.random().toString(36).slice(2, 8);
+
+      // Delayed loading
+      $('#start-hidden').addEventListener('click', async function () {
+        this.classList.add('hidden');
+        $('#finish-hidden').classList.add('hidden');
+        $('#loading-hidden').classList.remove('hidden');
+        await sleep(delay());
+        $('#loading-hidden').classList.add('hidden');
+        $('#finish-hidden').classList.remove('hidden');
+        this.classList.remove('hidden');
+      });
+      $('#start-rendered').addEventListener('click', async function () {
+        const c = $('#rendered-container');
+        this.disabled = true;
+        c.innerHTML = '<div id="loading-rendered"><span class="spinner"></span> Loading…</div>';
+        await sleep(delay());
+        c.innerHTML = '<h4 id="finish-rendered" data-testid="finish-rendered">Hello World!</h4>';
+        this.disabled = false;
+      });
+
+      // Enable / visible after 5 seconds
+      setTimeout(() => {
+        const b = $('#enable-after');
+        b.disabled = false;
+        b.textContent = 'I am enabled now';
+        $('#visible-after').style.display = '';
+        $('#color-change').style.color = 'var(--danger)';
+        $('#color-change').classList.add('text-danger');
+      }, 5000);
+      $('#enable-after').addEventListener('click', () => QA.toast('Enabled button clicked', 'success'));
+      $('#visible-after').addEventListener('click', () => QA.toast('Visible button clicked', 'success'));
+
+      $('#toggle-enable-field').addEventListener('click', async function () {
+        const field = $('#enable-field');
+        const status = $('#enable-field-status');
+        this.disabled = true;
+        status.innerHTML = '<span class="spinner spinner-sm"></span>';
+        await sleep(2000);
+        field.disabled = !field.disabled;
+        field.placeholder = field.disabled ? 'Disabled' : 'Enabled — type here';
+        this.textContent = field.disabled ? 'Enable' : 'Disable';
+        status.textContent = field.disabled ? "It's disabled!" : "It's enabled!";
+        this.disabled = false;
+      });
+      $('#toggle-checkbox').addEventListener('click', async function () {
+        const status = $('#checkbox-status');
+        this.disabled = true;
+        status.innerHTML = '<span class="spinner spinner-sm"></span>';
+        await sleep(2000);
+        const existing = $('#checkbox-wrapper');
+        if (existing) { existing.remove(); this.textContent = 'Add'; status.textContent = "It's gone!"; }
+        else {
+          const label = document.createElement('label');
+          label.className = 'check mb-0'; label.id = 'checkbox-wrapper';
+          label.innerHTML = '<input type="checkbox" id="removable-checkbox"> A checkbox';
+          this.before(label);
+          this.textContent = 'Remove'; status.textContent = "It's back!";
+        }
+        this.disabled = false;
+      });
+
+      // Dynamic IDs
+      function renderDynamicIds() {
+        const labels = ['Primary', 'Secondary', 'Danger'];
+        const cls = ['btn-primary', '', 'btn-danger'];
+        $('#dynamic-id-buttons').innerHTML = labels.map((l, i) =>
+          `<button class="btn ${cls[i]} btn-${rnd()}" id="btn-${rnd()}-${Date.now() % 10000}" data-stable="${l.toLowerCase()}">${l}</button>`).join('') +
+          `<input type="text" id="input-${rnd()}" name="field_${rnd()}" placeholder="Input with dynamic id and name">`;
+      }
+      renderDynamicIds();
+      $('#dynamic-id-buttons').addEventListener('click', (e) => {
+        const b = e.target.closest('button');
+        if (b) $('#dynamic-id-result').textContent = `${b.textContent} (id was ${b.id})`;
+      });
+      $('#regenerate-ids').addEventListener('click', renderDynamicIds);
+
+      // Add / remove
+      let added = 0;
+      const updateCount = () => { $('#element-count').textContent = $('#elements-container').children.length; };
+      $('#add-element').addEventListener('click', () => {
+        added++;
+        const b = document.createElement('button');
+        b.className = 'btn btn-sm btn-outline-danger added-manually';
+        b.textContent = 'Delete ' + added;
+        b.dataset.index = added;
+        b.addEventListener('click', () => { b.remove(); updateCount(); });
+        $('#elements-container').appendChild(b);
+        updateCount();
+      });
+
+      // Disappearing
+      if (Math.random() < 0.5) {
+        const li = document.createElement('li');
+        li.innerHTML = '<a class="btn" href="#disappearing" id="gallery-link">Gallery</a>';
+        $('#disappearing-menu').appendChild(li);
+      }
+      $('#flash-btn').addEventListener('click', () => {
+        const m = $('#flash-message');
+        m.classList.remove('hidden');
+        clearTimeout(m._t);
+        m._t = setTimeout(() => m.classList.add('hidden'), 2000);
+      });
+
+      // Changing text
+      $('#start-status').addEventListener('click', async function () {
+        this.disabled = true;
+        const s = $('#status-text');
+        for (const [text, wait] of [['Queued', 1500], ['Running', 2000], ['Completed', 2500]]) {
+          await sleep(wait);
+          s.textContent = text;
+        }
+        this.disabled = false;
+      });
+      const tick = () => { $('#live-clock').textContent = new Date().toLocaleTimeString(); };
+      tick(); setInterval(tick, 1000);
+      let counterTimer = null, counter = 0;
+      $('#counter-toggle').addEventListener('click', function () {
+        if (counterTimer) { clearInterval(counterTimer); counterTimer = null; this.textContent = 'Start'; }
+        else { counterTimer = setInterval(() => { $('#live-counter').textContent = ++counter; }, 500); this.textContent = 'Stop'; }
+      });
+      let renders = 0;
+      function renderStale() {
+        renders++;
+        $('#stale-list').innerHTML = ['Alpha', 'Beta', 'Gamma'].map((x) => `<li class="badge badge-info stale-item">${x} v${renders}</li>`).join('');
+      }
+      renderStale();
+      $('#stale-btn').addEventListener('click', renderStale);
+
+      // Progress bar
+      let pTimer = null, pVal = 0;
+      const bar = $('#progress-bar');
+      const setBar = (v) => { pVal = v; bar.style.width = v + '%'; bar.textContent = v + '%'; bar.setAttribute('aria-valuenow', v); };
+      $('#progress-start').addEventListener('click', () => {
+        if (pTimer) return;
+        $('#progress-result').textContent = '';
+        $('#progress-start').disabled = true; $('#progress-stop').disabled = false;
+        pTimer = setInterval(() => {
+          if (pVal >= 100) { clearInterval(pTimer); pTimer = null; $('#progress-stop').disabled = true; $('#progress-start').disabled = false; $('#progress-result').textContent = 'Completed'; return; }
+          setBar(pVal + 1);
+        }, 80);
+      });
+      $('#progress-stop').addEventListener('click', () => {
+        clearInterval(pTimer); pTimer = null;
+        $('#progress-start').disabled = false; $('#progress-stop').disabled = true;
+        $('#progress-result').textContent = pVal === 75 ? '✅ Stopped at exactly 75%!' : `Stopped at ${pVal}% (target 75%)`;
+      });
+      $('#progress-reset').addEventListener('click', () => {
+        clearInterval(pTimer); pTimer = null; setBar(0);
+        $('#progress-start').disabled = false; $('#progress-stop').disabled = true; $('#progress-result').textContent = '';
+      });
+
+      // Simulated AJAX
+      const people = [
+        [1, 'Leanne Graham', 'leanne@example.test', 'Gwenborough'], [2, 'Ervin Howell', 'ervin@example.test', 'Wisokyburgh'],
+        [3, 'Clementine Bauch', 'clementine@example.test', 'McKenziehaven'], [4, 'Patricia Lebsack', 'patricia@example.test', 'South Elvis'],
+        [5, 'Chelsey Dietrich', 'chelsey@example.test', 'Roscoeview']
+      ];
+      $('#load-users').addEventListener('click', async function () {
+        const status = $('#ajax-status');
+        const table = $('#ajax-table');
+        this.disabled = true;
+        table.classList.add('hidden');
+        status.innerHTML = '<span class="spinner spinner-sm" id="ajax-spinner"></span> Fetching users…';
+        await sleep(1000 + Math.random() * 2000);
+        this.disabled = false;
+        if (Math.random() < 0.2) {
+          status.innerHTML = '<div class="alert alert-error" id="ajax-error">Request failed: 503 Service Unavailable. Please retry.</div>';
+          return;
+        }
+        status.innerHTML = '<div class="alert alert-success" id="ajax-success">Loaded ' + people.length + ' users</div>';
+        table.querySelector('tbody').innerHTML = people.map((p) => `<tr>${p.map((c) => `<td>${c}</td>`).join('')}</tr>`).join('');
+        table.classList.remove('hidden');
+      });
+
+      // Random notifications
+      $('#notify-btn').addEventListener('click', () => {
+        const outcomes = [
+          ['alert-success', 'Action successful'],
+          ['alert-error', 'Action unsuccessful, please try again'],
+          ['alert-warning', 'Action completed with warnings']
+        ];
+        const [cls, text] = outcomes[Math.floor(Math.random() * outcomes.length)];
+        $('#notification-area').innerHTML = `<div class="alert ${cls}" id="flash" role="alert" data-testid="notification">${text}<button class="alert-close" aria-label="Close" onclick="this.parentElement.remove()">×</button></div>`;
+      });
+
+      // Random order
+      const planets = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'];
+      planets.sort(() => Math.random() - 0.5);
+      $('#shuffled-list').innerHTML = planets.map((p) => `<li><button class="btn btn-sm planet" data-planet="${p.toLowerCase()}">${p}</button></li>`).join('');
+      $('#shuffled-list').addEventListener('click', (e) => {
+        const b = e.target.closest('button');
+        if (b) $('#shuffle-result').textContent = b.textContent;
+      });
+
+      // Infinite scroll
+      let loaded = 0, loadingMore = false;
+      async function loadMore() {
+        if (loadingMore || loaded >= 100) return;
+        loadingMore = true;
+        await sleep(loaded === 0 ? 0 : 800);
+        const list = $('#infinite-list');
+        for (let i = 0; i < 10; i++) {
+          loaded++;
+          const li = document.createElement('li');
+          li.className = 'infinite-item';
+          li.dataset.index = loaded;
+          li.style.cssText = 'padding:10px;border-bottom:1px solid var(--border)';
+          li.textContent = 'Item ' + loaded;
+          list.appendChild(li);
+        }
+        $('#infinite-count').textContent = loaded;
+        if (loaded >= 100) $('#infinite-loader').textContent = 'No more items';
+        loadingMore = false;
+      }
+      $('#infinite-box').addEventListener('scroll', function () {
+        if (this.scrollTop + this.clientHeight >= this.scrollHeight - 30) loadMore();
+      });
+      loadMore();
+
+      // Moving target
+      let anim = null;
+      $('#animate-btn').addEventListener('click', function () {
+        const b = $('#moving-btn');
+        if (anim) { cancelAnimationFrame(anim); anim = null; this.textContent = 'Start animation'; return; }
+        this.textContent = 'Stop animation';
+        const start = performance.now();
+        const step = (t) => {
+          const w = b.parentElement.clientWidth - b.offsetWidth;
+          b.style.left = ((Math.sin((t - start) / 600) + 1) / 2) * w + 'px';
+          anim = requestAnimationFrame(step);
+        };
+        anim = requestAnimationFrame(step);
+      });
+      $('#moving-btn').addEventListener('click', () => { $('#moving-result').textContent = 'Caught it!'; });
+      function showOverlay() {
+        const o = $('#overlay');
+        o.style.display = 'flex';
+        setTimeout(() => { o.style.display = 'none'; }, 3000);
+      }
+      showOverlay();
+      $('#show-overlay').addEventListener('click', showOverlay);
+      $('#covered-btn').addEventListener('click', () => { $('#covered-result').textContent = 'Covered button clicked'; });
+    })();
+  </script>
+</body>
+</html>

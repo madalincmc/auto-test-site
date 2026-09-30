@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <div class="page-header">
+      <h1 id="cart-title">Your cart</h1>
+      <p id="cart-count" data-testid="cart-count"></p>
+    </div>
+
+    <div id="empty-cart" class="card empty-state hidden" data-testid="empty-cart">
+      <div class="empty-icon">🛒</div>
+      <h2>Your cart is empty</h2>
+      <p>Looks like you haven't added anything yet.</p>
+      <a href="shop.html" class="btn btn-primary" id="start-shopping">Start shopping</a>
+    </div>
+
+    <div id="cart-content" class="shop-layout cart-layout hidden">
+      <div class="card" style="padding:0">
+        <div class="table-wrap">
+          <table class="table" id="cart-table" data-testid="cart-table">
+            <thead>
+              <tr><th scope="col">Product</th><th scope="col">Price</th><th scope="col">Quantity</th><th scope="col" class="text-right">Total</th><th scope="col"><span class="hidden">Actions</span></th></tr>
+            </thead>
+            <tbody id="cart-items"></tbody>
+          </table>
+        </div>
+        <div class="row" style="padding:14px">
+          <a href="shop.html" class="btn" id="continue-shopping" data-testid="continue-shopping">← Continue shopping</a>
+          <span class="spacer"></span>
+          <button class="btn btn-outline-danger" id="clear-cart" data-testid="clear-cart">Clear cart</button>
+        </div>
+      </div>
+
+      <aside class="card" id="order-summary" aria-label="Order summary" data-testid="order-summary">
+        <h2>Summary</h2>
+        <form id="coupon-form" novalidate>
+          <label for="coupon-input" class="form-label">Coupon code</label>
+          <div class="input-group">
+            <input type="text" id="coupon-input" name="coupon" placeholder="e.g. SAVE10" data-testid="coupon-input">
+            <button type="submit" class="btn" id="apply-coupon" data-testid="apply-coupon">Apply</button>
+          </div>
+          <div class="field-error" id="coupon-error" data-testid="coupon-error"></div>
+        </form>
+        <div id="applied-coupon" class="alert alert-success hidden" style="margin-top:10px" data-testid="applied-coupon">
+          <span id="applied-coupon-text"></span>
+          <button type="button" class="alert-close" id="remove-coupon" aria-label="Remove coupon">×</button>
+        </div>
+        <div style="margin-top:14px">
+          <div class="summary-line"><span>Subtotal</span><span id="summary-subtotal" data-testid="summary-subtotal"></span></div>
+          <div class="summary-line hidden" id="discount-line" style="color:var(--success)"><span>Discount</span><span id="summary-discount" data-testid="summary-discount"></span></div>
+          <div class="summary-line"><span>Shipping (standard)</span><span id="summary-shipping" data-testid="summary-shipping"></span></div>
+          <div class="summary-line"><span>Tax (8%)</span><span id="summary-tax" data-testid="summary-tax"></span></div>
+          <div class="summary-line summary-total"><span>Total</span><span id="summary-total" data-testid="summary-total"></span></div>
+        </div>
+        <p class="small muted" id="free-shipping-hint"></p>
+        <a href="checkout.html" class="btn btn-success btn-block btn-lg" id="checkout-button" data-testid="checkout-button">Proceed to checkout</a>
+      </aside>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, money, escapeHtml, Cart, toast, requireAuth } = QA;
+      if (!requireAuth()) return;
+
+      function render() {
+        const t = Cart.totals('standard');
+        const count = Cart.count();
+        $('#cart-count').textContent = count + (count === 1 ? ' item' : ' items');
+        $('#empty-cart').classList.toggle('hidden', t.lines.length > 0);
+        $('#cart-content').classList.toggle('hidden', t.lines.length === 0);
+
+        $('#cart-items').innerHTML = t.lines.map((l) => `
+          <tr class="cart-item" data-key="${escapeHtml(l.key)}" data-product-id="${l.productId}" data-testid="cart-item">
+            <td>
+              <div class="row" style="flex-wrap:nowrap">
+                <span style="font-size:2rem" aria-hidden="true">${l.product.emoji}</span>
+                <div>
+                  <a href="product.html?id=${l.productId}" class="product-name cart-item-name">${escapeHtml(l.product.name)}</a>
+                  <div class="muted small cart-item-options">${[l.size && 'Size: ' + l.size, l.color && 'Colour: ' + l.color].filter(Boolean).join(' · ')}</div>
+                </div>
+              </div>
+            </td>
+            <td class="cart-item-price">${money(l.product.price)}</td>
+            <td>
+              <div class="qty-stepper">
+                <button type="button" data-action="dec" aria-label="Decrease quantity of ${escapeHtml(l.product.name)}">−</button>
+                <input type="number" class="cart-qty" value="${l.qty}" min="1" max="${l.product.stock}" aria-label="Quantity of ${escapeHtml(l.product.name)}" data-testid="cart-qty">
+                <button type="button" data-action="inc" aria-label="Increase quantity of ${escapeHtml(l.product.name)}" ${l.qty >= l.product.stock ? 'disabled' : ''}>+</button>
+              </div>
+            </td>
+            <td class="text-right cart-item-total" data-testid="line-total">${money(l.lineTotal)}</td>
+            <td><button class="btn btn-sm btn-link" data-action="remove" style="color:var(--danger)" data-testid="remove-item">Remove</button></td>
+          </tr>`).join('');
+
+        $('#summary-subtotal').textContent = money(t.subtotal);
+        $('#discount-line').classList.toggle('hidden', !t.discount);
+        $('#summary-discount').textContent = '−' + money(t.discount);
+        $('#summary-shipping').textContent = t.shipping === 0 ? 'FREE' : money(t.shipping);
+        $('#summary-tax').textContent = money(t.tax);
+        $('#summary-total').textContent = money(t.total);
+        const remaining = QA_DATA.FREE_SHIPPING_THRESHOLD - t.subtotal;
+        $('#free-shipping-hint').textContent = remaining > 0 ? `Add ${money(remaining)} more for free standard shipping.` : 'You qualify for free standard shipping!';
+
+        const code = Cart.coupon();
+        $('#applied-coupon').classList.toggle('hidden', !code);
+        if (code) {
+          const c = QA_DATA.coupons[code];
+          const notMet = c.min && t.subtotal < c.min;
+          $('#applied-coupon').className = 'alert ' + (notMet ? 'alert-warning' : 'alert-success');
+          $('#applied-coupon-text').textContent = `${code} — ${c.label}` + (notMet ? ` (add ${money(c.min - t.subtotal)} more to activate)` : '');
+        }
+      }
+
+      $('#cart-items').addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-action]');
+        if (!btn) return;
+        const row = btn.closest('tr');
+        const key = row.dataset.key;
+        const input = row.querySelector('.cart-qty');
+        const name = row.querySelector('.cart-item-name').textContent;
+        if (btn.dataset.action === 'remove') { Cart.remove(key); toast(`"${name}" removed from cart`); }
+        if (btn.dataset.action === 'inc') Cart.setQty(key, Number(input.value) + 1);
+        if (btn.dataset.action === 'dec') Cart.setQty(key, Number(input.value) - 1);
+        render();
+      });
+      $('#cart-items').addEventListener('change', (e) => {
+        if (!e.target.classList.contains('cart-qty')) return;
+        const row = e.target.closest('tr');
+        const max = Number(e.target.max);
+        let n = Math.floor(Number(e.target.value));
+        if (isNaN(n)) n = 1;
+        if (n > max) { n = max; toast(`Only ${max} available`, 'warning'); }
+        Cart.setQty(row.dataset.key, n);
+        render();
+      });
+
+      $('#coupon-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const code = $('#coupon-input').value.trim().toUpperCase();
+        const err = $('#coupon-error');
+        const c = QA_DATA.coupons[code];
+        if (!code) err.textContent = 'Please enter a coupon code';
+        else if (!c) err.textContent = 'Invalid coupon code';
+        else if (c.type === 'expired') err.textContent = 'This coupon has expired';
+        else {
+          err.textContent = '';
+          Cart.setCoupon(code);
+          $('#coupon-input').value = '';
+          toast('Coupon applied', 'success');
+        }
+        render();
+      });
+      $('#remove-coupon').addEventListener('click', () => { Cart.setCoupon(null); render(); });
+      $('#clear-cart').addEventListener('click', () => {
+        if (confirm('Remove all items from your cart?')) { Cart.clear(); render(); }
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

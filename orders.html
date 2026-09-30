@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <div class="page-header row">
+      <div>
+        <h1 class="mb-0" id="orders-title">My orders</h1>
+        <p id="orders-count" data-testid="orders-count"></p>
+      </div>
+      <span class="spacer"></span>
+      <label for="status-filter" class="muted small">Status</label>
+      <select id="status-filter" style="width:auto" data-testid="status-filter">
+        <option value="all">All orders</option>
+        <option value="Processing">Processing</option>
+        <option value="Cancelled">Cancelled</option>
+      </select>
+    </div>
+
+    <div id="no-orders" class="card empty-state hidden" data-testid="no-orders">
+      <div class="empty-icon">📦</div>
+      <h2>No orders yet</h2>
+      <p>When you place an order it will show up here.</p>
+      <a href="shop.html" class="btn btn-primary">Go shopping</a>
+    </div>
+
+    <div id="order-list" data-testid="order-list"></div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, money, escapeHtml, Orders, toast, requireAuth } = QA;
+      if (!requireAuth()) return;
+
+      function render() {
+        const filter = $('#status-filter').value;
+        const all = Orders.all();
+        const list = all.filter((o) => filter === 'all' || o.status === filter);
+        $('#orders-count').textContent = `${list.length} of ${all.length} orders`;
+        $('#no-orders').classList.toggle('hidden', all.length > 0);
+        $('#order-list').innerHTML = list.map((o) => `
+          <article class="card order" style="margin-bottom:12px" data-order-id="${o.id}" data-testid="order">
+            <div class="row">
+              <div>
+                <strong class="order-id">${o.id}</strong>
+                <div class="muted small order-date">${new Date(o.date).toLocaleString()}</div>
+              </div>
+              <span class="badge order-status ${o.status === 'Cancelled' ? 'badge-danger' : 'badge-info'}" data-testid="order-status">${o.status}</span>
+              <span class="spacer"></span>
+              <span class="order-total" data-testid="order-total"><strong>${money(o.total)}</strong></span>
+              <button class="btn btn-sm toggle-details" aria-expanded="false" aria-controls="details-${o.id}">Details</button>
+              ${o.status !== 'Cancelled' ? `<button class="btn btn-sm btn-outline-danger cancel-order" data-testid="cancel-order">Cancel</button>` : ''}
+            </div>
+            <div class="order-details hidden" id="details-${o.id}" style="margin-top:14px">
+              <div class="table-wrap">
+                <table class="table">
+                  <thead><tr><th>Item</th><th>Options</th><th>Qty</th><th>Price</th><th class="text-right">Total</th></tr></thead>
+                  <tbody>
+                    ${o.items.map((i) => `<tr><td>${escapeHtml(i.name)}</td><td>${[i.size, i.color].filter(Boolean).join(' / ') || '—'}</td><td>${i.qty}</td><td>${money(i.price)}</td><td class="text-right">${money(i.price * i.qty)}</td></tr>`).join('')}
+                  </tbody>
+                </table>
+              </div>
+              <div class="grid grid-2" style="margin-top:12px">
+                <dl class="details">
+                  <dt>Ship to</dt><dd>${escapeHtml(o.address.firstName)} ${escapeHtml(o.address.lastName)}, ${escapeHtml(o.address.street)}, ${escapeHtml(o.address.city)} ${escapeHtml(o.address.zip)}, ${escapeHtml(o.address.country)}</dd>
+                  <dt>Delivery</dt><dd>${escapeHtml(o.shippingMethod)}</dd>
+                  <dt>Payment</dt><dd>${escapeHtml(o.payment)}</dd>
+                </dl>
+                <dl class="details">
+                  <dt>Subtotal</dt><dd>${money(o.subtotal)}</dd>
+                  ${o.discount ? `<dt>Discount (${o.coupon})</dt><dd>−${money(o.discount)}</dd>` : ''}
+                  <dt>Shipping</dt><dd>${o.shipping ? money(o.shipping) : 'FREE'}</dd>
+                  <dt>Tax</dt><dd>${money(o.tax)}</dd>
+                  <dt>Total</dt><dd><strong>${money(o.total)}</strong></dd>
+                </dl>
+              </div>
+            </div>
+          </article>`).join('');
+      }
+
+      $('#order-list').addEventListener('click', (e) => {
+        const card = e.target.closest('.order');
+        if (!card) return;
+        if (e.target.closest('.toggle-details')) {
+          const btn = e.target.closest('.toggle-details');
+          const details = card.querySelector('.order-details');
+          const open = details.classList.toggle('hidden') === false;
+          btn.setAttribute('aria-expanded', open);
+          btn.textContent = open ? 'Hide details' : 'Details';
+        }
+        if (e.target.closest('.cancel-order')) {
+          if (!confirm('Cancel order ' + card.dataset.orderId + '?')) return;
+          Orders.cancel(card.dataset.orderId);
+          toast('Order ' + card.dataset.orderId + ' cancelled');
+          render();
+        }
+      });
+      $('#status-filter').addEventListener('change', render);
+      render();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Tables | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <div class="page-header">
+      <h1>Web Tables</h1>
+      <p>Read cells, find rows by content, sort, filter, paginate and edit data.</p>
+    </div>
+    <nav class="toc" aria-label="On this page">
+      <a href="#static-table-section">Static table</a><a href="#employees-section">Dynamic CRUD table</a>
+      <a href="#selectable-section">Selectable rows</a><a href="#no-id-section">Table without IDs</a>
+      <a href="#merged-section">Merged cells</a><a href="#div-grid-section">Div-based grid</a>
+    </nav>
+
+    <!-- ============ STATIC ============ -->
+    <section class="section card" id="static-table-section">
+      <h2>Static table</h2>
+      <p class="section-desc">Classic table with <code>thead</code>, <code>tbody</code> and <code>tfoot</code>. Try: "get the price of Product C", "sum the Qty column".</p>
+      <div class="table-wrap">
+        <table class="table" id="static-table" data-testid="static-table">
+          <caption class="muted small" style="caption-side:bottom;padding-top:8px">Quarterly sales</caption>
+          <thead>
+            <tr><th scope="col">Product</th><th scope="col">Region</th><th scope="col">Qty</th><th scope="col">Unit price</th><th scope="col">Revenue</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Product A</td><td>North</td><td>12</td><td>$10.00</td><td>$120.00</td></tr>
+            <tr><td>Product B</td><td>South</td><td>7</td><td>$25.50</td><td>$178.50</td></tr>
+            <tr><td>Product C</td><td>East</td><td>20</td><td>$4.25</td><td>$85.00</td></tr>
+            <tr><td>Product D</td><td>West</td><td>3</td><td>$99.99</td><td>$299.97</td></tr>
+            <tr><td>Product E</td><td>North</td><td>15</td><td>$12.00</td><td>$180.00</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><td colspan="2">Total</td><td id="total-qty">57</td><td></td><td id="total-revenue">$863.47</td></tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ DYNAMIC CRUD ============ -->
+    <section class="section card" id="employees-section">
+      <div class="card-title">
+        <h2 class="mb-0">Employees (sort, search, paginate, CRUD)</h2>
+        <button class="btn btn-primary" id="add-employee" data-testid="add-employee">+ Add employee</button>
+      </div>
+      <div class="row" style="margin-bottom:12px">
+        <input type="search" id="employee-search" placeholder="Search employees…" aria-label="Search employees" style="max-width:280px" data-testid="employee-search">
+        <select id="department-filter" style="width:auto" aria-label="Filter by department">
+          <option value="">All departments</option>
+        </select>
+        <span class="spacer"></span>
+        <label for="page-size" class="small muted">Rows per page</label>
+        <select id="page-size" style="width:auto" data-testid="page-size">
+          <option>5</option><option selected>10</option><option>20</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table class="table" id="employees-table" data-testid="employees-table">
+          <thead>
+            <tr>
+              <th class="sortable" data-key="id" scope="col">ID</th>
+              <th class="sortable" data-key="firstName" scope="col">First name</th>
+              <th class="sortable" data-key="lastName" scope="col">Last name</th>
+              <th class="sortable" data-key="email" scope="col">Email</th>
+              <th class="sortable" data-key="age" scope="col">Age</th>
+              <th class="sortable" data-key="salary" scope="col">Salary</th>
+              <th class="sortable" data-key="department" scope="col">Department</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="employees-body"></tbody>
+        </table>
+      </div>
+      <p id="employees-empty" class="empty-state hidden">No employees found.</p>
+      <div class="row">
+        <span id="employees-info" class="small muted" data-testid="employees-info"></span>
+        <span class="spacer"></span>
+        <ul class="pagination" id="employees-pagination" style="margin:0"></ul>
+      </div>
+    </section>
+
+    <!-- ============ SELECTABLE ============ -->
+    <section class="section card" id="selectable-section">
+      <h2>Selectable rows &amp; bulk actions</h2>
+      <div class="row" style="margin-bottom:10px">
+        <button class="btn btn-sm" id="bulk-approve" disabled>Approve selected</button>
+        <button class="btn btn-sm btn-outline-danger" id="bulk-reject" disabled>Reject selected</button>
+        <span id="selected-count" class="small muted" data-testid="selected-count">0 selected</span>
+      </div>
+      <div class="table-wrap">
+        <table class="table" id="tasks-table" data-testid="tasks-table">
+          <thead><tr><th><input type="checkbox" id="select-all-tasks" aria-label="Select all tasks"></th><th>Task</th><th>Assignee</th><th>Priority</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr data-task-id="T-1"><td><input type="checkbox" class="row-select" aria-label="Select T-1"></td><td>Write login tests</td><td>Alice</td><td><span class="badge badge-danger">High</span></td><td class="task-status">Pending</td></tr>
+            <tr data-task-id="T-2"><td><input type="checkbox" class="row-select" aria-label="Select T-2"></td><td>Fix flaky checkout test</td><td>Bob</td><td><span class="badge badge-danger">High</span></td><td class="task-status">Pending</td></tr>
+            <tr data-task-id="T-3"><td><input type="checkbox" class="row-select" aria-label="Select T-3"></td><td>Add API contract tests</td><td>Carol</td><td><span class="badge badge-warning">Medium</span></td><td class="task-status">Pending</td></tr>
+            <tr data-task-id="T-4"><td><input type="checkbox" class="row-select" aria-label="Select T-4"></td><td>Update test data</td><td>Dan</td><td><span class="badge">Low</span></td><td class="task-status">Pending</td></tr>
+            <tr data-task-id="T-5"><td><input type="checkbox" class="row-select" aria-label="Select T-5"></td><td>Review page objects</td><td>Eve</td><td><span class="badge badge-warning">Medium</span></td><td class="task-status">Pending</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ NO IDs ============ -->
+    <section class="section card" id="no-id-section">
+      <h2>Table without IDs or classes</h2>
+      <p class="section-desc">Pure XPath practice, e.g. <code>//td[text()='Germany']/preceding-sibling::td[1]</code> or "find the capital of the country with the largest population".</p>
+      <div class="table-wrap">
+        <table border="1" cellpadding="8" style="border-collapse:collapse;width:100%;background:var(--surface)">
+          <tr><th>Company</th><th>Contact</th><th>Country</th><th>Capital</th><th>Population (M)</th></tr>
+          <tr><td>Alfreds Futterkiste</td><td>Maria Anders</td><td>Germany</td><td>Berlin</td><td>84.4</td></tr>
+          <tr><td>Centro comercial Moctezuma</td><td>Francisco Chang</td><td>Mexico</td><td>Mexico City</td><td>128.5</td></tr>
+          <tr><td>Ernst Handel</td><td>Roland Mendel</td><td>Austria</td><td>Vienna</td><td>9.1</td></tr>
+          <tr><td>Island Trading</td><td>Helen Bennett</td><td>UK</td><td>London</td><td>67.7</td></tr>
+          <tr><td>Laughing Bacchus Winecellars</td><td>Yoshi Tannamuri</td><td>Canada</td><td>Ottawa</td><td>39.6</td></tr>
+          <tr><td>Magazzini Alimentari Riuniti</td><td>Giovanni Rovelli</td><td>Italy</td><td>Rome</td><td>58.9</td></tr>
+          <tr><td>Carpathian Software</td><td>Ioana Popescu</td><td>Romania</td><td>Bucharest</td><td>19.0</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ MERGED ============ -->
+    <section class="section card" id="merged-section">
+      <h2>Merged cells (rowspan / colspan)</h2>
+      <div class="table-wrap">
+        <table class="table" id="merged-table" style="text-align:center">
+          <thead>
+            <tr><th rowspan="2">Day</th><th colspan="2">Morning</th><th colspan="2">Afternoon</th></tr>
+            <tr><th>9:00</th><th>11:00</th><th>14:00</th><th>16:00</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Monday</td><td colspan="2">Sprint planning</td><td>Test design</td><td>Automation</td></tr>
+            <tr><td>Tuesday</td><td>Stand-up</td><td>Bug bash</td><td rowspan="2">Regression run</td><td>Review</td></tr>
+            <tr><td>Wednesday</td><td>Stand-up</td><td>Pairing</td><td>Demo</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ DIV GRID ============ -->
+    <section class="section card" id="div-grid-section">
+      <h2>Div-based grid (ARIA roles)</h2>
+      <p class="section-desc">Looks like a table but is built with <code>div</code>s and <code>role="grid"</code>. Use role-based locators.</p>
+      <div class="div-table" role="grid" aria-label="Stock prices" id="div-grid">
+        <div role="row"><div role="columnheader">Company</div><div role="columnheader">Ticker</div><div role="columnheader">Price</div><div role="columnheader">Change</div></div>
+        <div role="row"><div role="gridcell">Acme Corp</div><div role="gridcell">ACME</div><div role="gridcell">$123.45</div><div role="gridcell" style="color:var(--success)">+1.2%</div></div>
+        <div role="row"><div role="gridcell">Globex</div><div role="gridcell">GLBX</div><div role="gridcell">$87.10</div><div role="gridcell" style="color:var(--danger)">-0.8%</div></div>
+        <div role="row"><div role="gridcell">Initech</div><div role="gridcell">INIT</div><div role="gridcell">$45.67</div><div role="gridcell" style="color:var(--success)">+3.4%</div></div>
+        <div role="row"><div role="gridcell">Umbrella</div><div role="gridcell">UMBR</div><div role="gridcell">$210.00</div><div role="gridcell" style="color:var(--danger)">-2.1%</div></div>
+      </div>
+    </section>
+
+    <!-- Employee modal -->
+    <div class="modal-backdrop" id="employee-modal" role="dialog" aria-modal="true" aria-labelledby="employee-modal-title">
+      <div class="modal">
+        <form id="employee-form" novalidate>
+          <div class="modal-header"><h3 id="employee-modal-title">Add employee</h3><button type="button" class="modal-close" data-close aria-label="Close">×</button></div>
+          <div class="modal-body">
+            <input type="hidden" id="emp-id">
+            <div class="form-row">
+              <div class="form-group"><label for="emp-first">First name</label><input type="text" id="emp-first" name="firstName" data-testid="emp-first"><div class="field-error" id="emp-first-error"></div></div>
+              <div class="form-group"><label for="emp-last">Last name</label><input type="text" id="emp-last" name="lastName" data-testid="emp-last"><div class="field-error" id="emp-last-error"></div></div>
+            </div>
+            <div class="form-group"><label for="emp-email">Email</label><input type="email" id="emp-email" name="email" data-testid="emp-email"><div class="field-error" id="emp-email-error"></div></div>
+            <div class="form-row">
+              <div class="form-group"><label for="emp-age">Age</label><input type="number" id="emp-age" name="age" data-testid="emp-age"><div class="field-error" id="emp-age-error"></div></div>
+              <div class="form-group"><label for="emp-salary">Salary</label><input type="number" id="emp-salary" name="salary" data-testid="emp-salary"><div class="field-error" id="emp-salary-error"></div></div>
+            </div>
+            <div class="form-group"><label for="emp-department">Department</label><select id="emp-department" name="department" data-testid="emp-department"></select></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn" data-close id="emp-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="emp-submit" data-testid="emp-submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, $$, escapeHtml, toast, Store } = QA;
+      const DEPARTMENTS = ['Engineering', 'QA', 'Sales', 'Marketing', 'HR', 'Finance'];
+      const FIRST = ['Ana', 'Ben', 'Chloe', 'David', 'Elena', 'Farid', 'Grace', 'Hugo', 'Ivy', 'Jon', 'Kira', 'Liam', 'Maya', 'Noah', 'Olga', 'Paul', 'Quinn', 'Rosa', 'Sven', 'Tara', 'Umar', 'Vera', 'Will', 'Xena', 'Yuri'];
+      const LAST = ['Smith', 'Ionescu', 'Garcia', 'Müller', 'Rossi', 'Khan', 'Lee', 'Novak', 'Silva', 'Brown'];
+      const seed = FIRST.map((f, i) => ({
+        id: i + 1,
+        firstName: f,
+        lastName: LAST[(i * 3) % LAST.length],
+        email: (f + '.' + LAST[(i * 3) % LAST.length]).toLowerCase().replace('ü', 'u') + '@company.test',
+        age: 22 + ((i * 7) % 40),
+        salary: 3000 + ((i * 1370) % 9000),
+        department: DEPARTMENTS[i % DEPARTMENTS.length]
+      }));
+
+      let employees = Store.get('qa_employees', null) || seed;
+      const save = () => Store.set('qa_employees', employees);
+      let sortKey = 'id', sortDir = 1, page = 1;
+
+      $('#department-filter').innerHTML += DEPARTMENTS.map((d) => `<option>${d}</option>`).join('');
+      $('#emp-department').innerHTML = DEPARTMENTS.map((d) => `<option>${d}</option>`).join('');
+
+      function render() {
+        const q = $('#employee-search').value.trim().toLowerCase();
+        const dept = $('#department-filter').value;
+        const size = Number($('#page-size').value);
+        let list = employees.filter((e) =>
+          (!dept || e.department === dept) &&
+          (!q || Object.values(e).some((v) => String(v).toLowerCase().includes(q))));
+        list = list.slice().sort((a, b) => {
+          const x = a[sortKey], y = b[sortKey];
+          return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y))) * sortDir;
+        });
+        const pages = Math.max(1, Math.ceil(list.length / size));
+        if (page > pages) page = pages;
+        const slice = list.slice((page - 1) * size, page * size);
+
+        $('#employees-body').innerHTML = slice.map((e) => `
+          <tr data-employee-id="${e.id}" data-testid="employee-row">
+            <td>${e.id}</td><td>${escapeHtml(e.firstName)}</td><td>${escapeHtml(e.lastName)}</td><td>${escapeHtml(e.email)}</td>
+            <td>${e.age}</td><td>${e.salary}</td><td>${escapeHtml(e.department)}</td>
+            <td class="row" style="gap:4px;flex-wrap:nowrap">
+              <button class="btn btn-sm" data-action="edit" id="edit-record-${e.id}" aria-label="Edit ${escapeHtml(e.firstName)} ${escapeHtml(e.lastName)}">✏️</button>
+              <button class="btn btn-sm" data-action="delete" id="delete-record-${e.id}" aria-label="Delete ${escapeHtml(e.firstName)} ${escapeHtml(e.lastName)}">🗑️</button>
+            </td>
+          </tr>`).join('');
+        $('#employees-empty').classList.toggle('hidden', list.length > 0);
+        $('#employees-info').textContent = list.length
+          ? `Showing ${(page - 1) * size + 1} to ${Math.min(page * size, list.length)} of ${list.length} entries`
+          : 'Showing 0 entries';
+        $$('#employees-table th.sortable').forEach((th) => {
+          if (th.dataset.key === sortKey) th.setAttribute('aria-sort', sortDir === 1 ? 'ascending' : 'descending');
+          else th.removeAttribute('aria-sort');
+        });
+        $('#employees-pagination').innerHTML = `
+          <li><button class="btn btn-sm" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} id="emp-prev">Previous</button></li>
+          ${Array.from({ length: pages }, (_, i) => `<li><button class="btn btn-sm${i + 1 === page ? ' active' : ''}" data-page="${i + 1}">${i + 1}</button></li>`).join('')}
+          <li><button class="btn btn-sm" data-page="${page + 1}" ${page === pages ? 'disabled' : ''} id="emp-next">Next</button></li>`;
+      }
+
+      $$('#employees-table th.sortable').forEach((th) => th.addEventListener('click', () => {
+        if (sortKey === th.dataset.key) sortDir *= -1; else { sortKey = th.dataset.key; sortDir = 1; }
+        render();
+      }));
+      $('#employee-search').addEventListener('input', () => { page = 1; render(); });
+      $('#department-filter').addEventListener('change', () => { page = 1; render(); });
+      $('#page-size').addEventListener('change', () => { page = 1; render(); });
+      $('#employees-pagination').addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-page]');
+        if (b && !b.disabled) { page = Number(b.dataset.page); render(); }
+      });
+
+      // Modal
+      const modal = $('#employee-modal');
+      function openModal(emp) {
+        $('#employee-modal-title').textContent = emp ? 'Edit employee' : 'Add employee';
+        $('#emp-id').value = emp ? emp.id : '';
+        $('#emp-first').value = emp ? emp.firstName : '';
+        $('#emp-last').value = emp ? emp.lastName : '';
+        $('#emp-email').value = emp ? emp.email : '';
+        $('#emp-age').value = emp ? emp.age : '';
+        $('#emp-salary').value = emp ? emp.salary : '';
+        $('#emp-department').value = emp ? emp.department : DEPARTMENTS[0];
+        $$('.field-error', modal).forEach((e) => (e.textContent = ''));
+        $$('.is-invalid', modal).forEach((e) => e.classList.remove('is-invalid'));
+        modal.classList.add('open');
+        $('#emp-first').focus();
+      }
+      const closeModal = () => modal.classList.remove('open');
+      $('#add-employee').addEventListener('click', () => openModal(null));
+      $$('[data-close]', modal).forEach((b) => b.addEventListener('click', closeModal));
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+      $('#employees-body').addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-action]');
+        if (!b) return;
+        const id = Number(b.closest('tr').dataset.employeeId);
+        const emp = employees.find((x) => x.id === id);
+        if (b.dataset.action === 'edit') openModal(emp);
+        else {
+          employees = employees.filter((x) => x.id !== id);
+          save(); render();
+          toast(`Deleted ${emp.firstName} ${emp.lastName}`);
+        }
+      });
+
+      $('#employee-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const err = (id, msg) => { $('#' + id + '-error').textContent = msg; $('#' + id).classList.toggle('is-invalid', !!msg); return !msg; };
+        const age = Number($('#emp-age').value);
+        const salary = Number($('#emp-salary').value);
+        const ok = [
+          err('emp-first', $('#emp-first').value.trim() ? '' : 'Required'),
+          err('emp-last', $('#emp-last').value.trim() ? '' : 'Required'),
+          err('emp-email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($('#emp-email').value.trim()) ? '' : 'Invalid email'),
+          err('emp-age', Number.isInteger(age) && age >= 18 && age <= 99 ? '' : 'Age must be 18-99'),
+          err('emp-salary', salary > 0 ? '' : 'Salary must be positive')
+        ].every(Boolean);
+        if (!ok) return;
+        const data = {
+          firstName: $('#emp-first').value.trim(), lastName: $('#emp-last').value.trim(),
+          email: $('#emp-email').value.trim(), age, salary, department: $('#emp-department').value
+        };
+        const id = Number($('#emp-id').value);
+        if (id) Object.assign(employees.find((x) => x.id === id), data);
+        else employees.push(Object.assign({ id: employees.reduce((m, x) => Math.max(m, x.id), 0) + 1 }, data));
+        save(); closeModal(); render();
+        toast(id ? 'Employee updated' : 'Employee added', 'success');
+      });
+
+      render();
+
+      // Selectable rows
+      const rowBoxes = $$('#tasks-table .row-select');
+      const allBox = $('#select-all-tasks');
+      function updateSelection() {
+        const selected = rowBoxes.filter((c) => c.checked);
+        rowBoxes.forEach((c) => c.closest('tr').classList.toggle('selected', c.checked));
+        allBox.checked = selected.length === rowBoxes.length;
+        allBox.indeterminate = selected.length > 0 && selected.length < rowBoxes.length;
+        $('#selected-count').textContent = selected.length + ' selected';
+        $('#bulk-approve').disabled = $('#bulk-reject').disabled = !selected.length;
+      }
+      allBox.addEventListener('change', () => { rowBoxes.forEach((c) => (c.checked = allBox.checked)); updateSelection(); });
+      rowBoxes.forEach((c) => c.addEventListener('change', updateSelection));
+      function bulk(status) {
+        rowBoxes.filter((c) => c.checked).forEach((c) => {
+          const cell = c.closest('tr').querySelector('.task-status');
+          cell.textContent = status;
+          c.checked = false;
+        });
+        updateSelection();
+        toast('Tasks marked as ' + status);
+      }
+      $('#bulk-approve').addEventListener('click', () => bulk('Approved'));
+      $('#bulk-reject').addEventListener('click', () => bulk('Rejected'));
+    })();
+  </script>
+</body>
+</html>

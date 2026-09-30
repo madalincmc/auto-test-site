@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign up | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <div class="auth-wrap" style="max-width:640px">
+      <div class="card">
+        <h1 id="register-title">Create an account</h1>
+        <p class="muted">All fields marked with <span aria-hidden="true">*</span> are required.</p>
+
+        <div id="register-error" class="alert alert-error hidden" role="alert" data-testid="register-error"></div>
+
+        <form id="register-form" name="registerForm" novalidate data-testid="register-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="first-name">First name *</label>
+              <input type="text" id="first-name" name="firstName" data-testid="first-name" autocomplete="given-name">
+              <div class="field-error" id="first-name-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="last-name">Last name *</label>
+              <input type="text" id="last-name" name="lastName" data-testid="last-name" autocomplete="family-name">
+              <div class="field-error" id="last-name-error"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="reg-email">Email *</label>
+            <input type="email" id="reg-email" name="email" data-testid="email" placeholder="name@example.com" autocomplete="email">
+            <div class="field-error" id="reg-email-error"></div>
+          </div>
+          <div class="form-group">
+            <label for="reg-username">Username *</label>
+            <input type="text" id="reg-username" name="username" data-testid="reg-username" autocomplete="username">
+            <div class="field-hint">4-20 characters: letters, numbers and underscores.</div>
+            <div class="field-error" id="reg-username-error"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reg-password">Password *</label>
+              <input type="password" id="reg-password" name="password" data-testid="reg-password" autocomplete="new-password">
+              <div class="progress" style="height:6px;margin-top:6px" aria-hidden="true"><div class="progress-bar" id="strength-bar" style="width:0"></div></div>
+              <div class="field-hint" id="password-strength" data-testid="password-strength">Strength: —</div>
+              <div class="field-error" id="reg-password-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="confirm-password">Confirm password *</label>
+              <input type="password" id="confirm-password" name="confirmPassword" data-testid="confirm-password" autocomplete="new-password">
+              <div class="field-error" id="confirm-password-error"></div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reg-country">Country *</label>
+              <select id="reg-country" name="country" data-testid="country">
+                <option value="">-- Select country --</option>
+              </select>
+              <div class="field-error" id="reg-country-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="reg-dob">Date of birth</label>
+              <input type="date" id="reg-dob" name="dob" data-testid="dob">
+              <div class="field-error" id="reg-dob-error"></div>
+            </div>
+          </div>
+          <fieldset id="gender-group">
+            <legend>Gender</legend>
+            <div class="row">
+              <label class="check"><input type="radio" name="gender" value="male" id="gender-male"> Male</label>
+              <label class="check"><input type="radio" name="gender" value="female" id="gender-female"> Female</label>
+              <label class="check"><input type="radio" name="gender" value="other" id="gender-other"> Other</label>
+              <label class="check"><input type="radio" name="gender" value="na" id="gender-na" checked> Prefer not to say</label>
+            </div>
+          </fieldset>
+          <label class="check"><input type="checkbox" id="newsletter" name="newsletter"> Subscribe to the newsletter</label>
+          <label class="check"><input type="checkbox" id="terms" name="terms" data-testid="terms"> I agree to the <a href="#" id="terms-link">terms and conditions</a> *</label>
+          <div class="field-error" id="terms-error"></div>
+
+          <div class="row" style="margin-top:16px">
+            <button type="submit" class="btn btn-primary btn-lg" id="register-button" data-testid="register-button">Create account</button>
+            <button type="reset" class="btn btn-lg" id="reset-button">Clear form</button>
+          </div>
+        </form>
+        <hr>
+        <p class="mb-0">Already registered? <a href="login.html" id="login-link">Log in</a></p>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, $$, allUsers, register } = QA;
+      const countrySelect = $('#reg-country');
+      QA_DATA.countries.forEach((c) => countrySelect.add(new Option(c.name, c.code)));
+
+      function strength(pw) {
+        let score = 0;
+        if (pw.length >= 8) score++;
+        if (/[A-Z]/.test(pw)) score++;
+        if (/[a-z]/.test(pw)) score++;
+        if (/\d/.test(pw)) score++;
+        if (/[^A-Za-z0-9]/.test(pw)) score++;
+        return score;
+      }
+      $('#reg-password').addEventListener('input', (e) => {
+        const s = strength(e.target.value);
+        const labels = ['—', 'Very weak', 'Weak', 'Medium', 'Strong', 'Very strong'];
+        const colors = ['#c3c9d6', '#c92a2a', '#e8590c', '#f08c00', '#2b8a3e', '#2b8a3e'];
+        $('#password-strength').textContent = 'Strength: ' + labels[e.target.value ? s : 0];
+        const bar = $('#strength-bar');
+        bar.style.width = (s * 20) + '%';
+        bar.style.background = colors[s];
+      });
+      $('#terms-link').addEventListener('click', (e) => { e.preventDefault(); QA.toast('Terms: be nice to your test suite.'); });
+
+      const fields = {
+        'first-name': (v) => (!v ? 'First name is required' : v.length < 2 ? 'First name must be at least 2 characters' : ''),
+        'last-name': (v) => (!v ? 'Last name is required' : ''),
+        'reg-email': (v) => (!v ? 'Email is required'
+          : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? 'Please enter a valid email address'
+          : allUsers().some((u) => u.email.toLowerCase() === v.toLowerCase()) ? 'An account with this email already exists' : ''),
+        'reg-username': (v) => (!v ? 'Username is required'
+          : !/^\w{4,20}$/.test(v) ? 'Username must be 4-20 characters: letters, numbers or underscores'
+          : allUsers().some((u) => u.username.toLowerCase() === v.toLowerCase()) ? 'Username is already taken' : ''),
+        'reg-password': (v) => (!v ? 'Password is required'
+          : strength(v) < 4 || v.length < 8 ? 'Password must be at least 8 characters and include upper case, lower case, a number and a symbol' : ''),
+        'confirm-password': (v) => (!v ? 'Please confirm your password' : v !== $('#reg-password').value ? 'Passwords do not match' : ''),
+        'reg-country': (v) => (!v ? 'Please select a country' : ''),
+        'reg-dob': (v) => {
+          if (!v) return '';
+          const age = (Date.now() - new Date(v).getTime()) / (365.25 * 864e5);
+          return age < 13 ? 'You must be at least 13 years old' : age > 120 ? 'Please enter a valid date of birth' : '';
+        }
+      };
+
+      function validateField(id) {
+        const el = $('#' + id);
+        const msg = fields[id](el.value.trim());
+        $('#' + id + '-error').textContent = msg;
+        el.classList.toggle('is-invalid', !!msg);
+        el.classList.toggle('is-valid', !msg && !!el.value);
+        el.setAttribute('aria-invalid', !!msg);
+        return !msg;
+      }
+      Object.keys(fields).forEach((id) => $('#' + id).addEventListener('blur', () => validateField(id)));
+
+      $('#register-form').addEventListener('reset', () => {
+        $$('.field-error').forEach((e) => (e.textContent = ''));
+        $$('.is-invalid, .is-valid').forEach((e) => e.classList.remove('is-invalid', 'is-valid'));
+        $('#register-error').classList.add('hidden');
+        $('#password-strength').textContent = 'Strength: —';
+        $('#strength-bar').style.width = '0';
+      });
+
+      $('#register-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const results = Object.keys(fields).map(validateField);
+        const termsOk = $('#terms').checked;
+        $('#terms-error').textContent = termsOk ? '' : 'You must accept the terms and conditions';
+        const errorBox = $('#register-error');
+        const errorCount = results.filter((r) => !r).length + (termsOk ? 0 : 1);
+        if (errorCount) {
+          errorBox.textContent = 'Please fix ' + errorCount + (errorCount === 1 ? ' error' : ' errors') + ' before submitting.';
+          errorBox.classList.remove('hidden');
+          const firstInvalid = document.querySelector('.is-invalid') || $('#terms');
+          firstInvalid.focus();
+          return;
+        }
+        errorBox.classList.add('hidden');
+        const username = $('#reg-username').value.trim();
+        const country = $('#reg-country').value;
+        register({
+          username,
+          password: $('#reg-password').value,
+          firstName: $('#first-name').value.trim(),
+          lastName: $('#last-name').value.trim(),
+          email: $('#reg-email').value.trim(),
+          phone: '',
+          dob: $('#reg-dob').value,
+          gender: (document.querySelector('input[name="gender"]:checked') || {}).value || 'na',
+          bio: '',
+          address: { street: '', city: '', state: '', zip: '', country },
+          preferences: { newsletter: $('#newsletter').checked }
+        });
+        location.href = 'login.html?registered=' + encodeURIComponent(username);
+      });
+    })();
+  </script>
+</body>
+</html>

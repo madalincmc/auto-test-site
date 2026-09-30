@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <h1 id="checkout-title">Checkout</h1>
+    <ol class="stepper" id="checkout-steps" data-testid="checkout-steps">
+      <li data-step="1" id="step-indicator-1">1. Shipping</li>
+      <li data-step="2" id="step-indicator-2">2. Payment</li>
+      <li data-step="3" id="step-indicator-3">3. Review</li>
+      <li data-step="4" id="step-indicator-4">4. Confirmation</li>
+    </ol>
+
+    <div class="shop-layout cart-layout" id="checkout-layout">
+      <div>
+        <!-- Step 1: Shipping -->
+        <section class="card" id="step-1" data-testid="step-shipping">
+          <h2>Shipping information</h2>
+          <label class="check" style="margin-bottom:14px"><input type="checkbox" id="use-saved-address"> Use my saved address</label>
+          <form id="shipping-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ship-first-name">First name</label>
+                <input type="text" id="ship-first-name" name="firstName" data-testid="ship-first-name" autocomplete="given-name">
+                <div class="field-error" id="ship-first-name-error"></div>
+              </div>
+              <div class="form-group">
+                <label for="ship-last-name">Last name</label>
+                <input type="text" id="ship-last-name" name="lastName" data-testid="ship-last-name" autocomplete="family-name">
+                <div class="field-error" id="ship-last-name-error"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="ship-email">Email</label>
+              <input type="email" id="ship-email" name="email" data-testid="ship-email" autocomplete="email">
+              <div class="field-error" id="ship-email-error"></div>
+            </div>
+            <div class="form-group">
+              <label for="ship-street">Street address</label>
+              <input type="text" id="ship-street" name="street" data-testid="ship-street" autocomplete="street-address">
+              <div class="field-error" id="ship-street-error"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ship-city">City</label>
+                <input type="text" id="ship-city" name="city" data-testid="ship-city">
+                <div class="field-error" id="ship-city-error"></div>
+              </div>
+              <div class="form-group">
+                <label for="ship-zip">ZIP / Postal code</label>
+                <input type="text" id="ship-zip" name="zip" data-testid="ship-zip" autocomplete="postal-code">
+                <div class="field-error" id="ship-zip-error"></div>
+              </div>
+              <div class="form-group">
+                <label for="ship-country">Country</label>
+                <select id="ship-country" name="country" data-testid="ship-country"><option value="">Select…</option></select>
+                <div class="field-error" id="ship-country-error"></div>
+              </div>
+            </div>
+            <fieldset id="shipping-methods">
+              <legend>Delivery method</legend>
+              <div id="shipping-method-options"></div>
+            </fieldset>
+            <div class="row">
+              <a href="cart.html" class="btn" id="back-to-cart">← Back to cart</a>
+              <span class="spacer"></span>
+              <button type="submit" class="btn btn-primary" id="continue-to-payment" data-testid="continue-to-payment">Continue to payment</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Step 2: Payment -->
+        <section class="card hidden" id="step-2" data-testid="step-payment">
+          <h2>Payment</h2>
+          <form id="payment-form" novalidate>
+            <fieldset>
+              <legend>Payment method</legend>
+              <label class="check"><input type="radio" name="paymentMethod" value="card" id="pay-card" checked> Credit / debit card</label>
+              <label class="check"><input type="radio" name="paymentMethod" value="paypal" id="pay-paypal"> PayPal</label>
+              <label class="check"><input type="radio" name="paymentMethod" value="cod" id="pay-cod"> Cash on delivery</label>
+            </fieldset>
+            <div id="card-fields">
+              <div class="form-group">
+                <label for="card-name">Name on card</label>
+                <input type="text" id="card-name" name="cardName" autocomplete="cc-name" data-testid="card-name">
+                <div class="field-error" id="card-name-error"></div>
+              </div>
+              <div class="form-group">
+                <label for="card-number">Card number</label>
+                <input type="text" id="card-number" name="cardNumber" inputmode="numeric" autocomplete="cc-number" placeholder="1234 5678 9012 3456" maxlength="19" data-testid="card-number">
+                <div class="field-hint">Try 4111 1111 1111 1111 (success) or 4000 0000 0000 0002 (declined).</div>
+                <div class="field-error" id="card-number-error"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="card-expiry">Expiry (MM/YY)</label>
+                  <input type="text" id="card-expiry" name="cardExpiry" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp" data-testid="card-expiry">
+                  <div class="field-error" id="card-expiry-error"></div>
+                </div>
+                <div class="form-group">
+                  <label for="card-cvv">CVV</label>
+                  <input type="password" id="card-cvv" name="cardCvv" maxlength="4" inputmode="numeric" autocomplete="cc-csc" data-testid="card-cvv">
+                  <div class="field-error" id="card-cvv-error"></div>
+                </div>
+              </div>
+            </div>
+            <div id="paypal-fields" class="hidden alert alert-info">You'll confirm the payment with PayPal after reviewing your order (simulated).</div>
+            <div id="cod-fields" class="hidden alert alert-info">A $3.00 cash handling fee is not charged in this demo. Pay the courier on delivery.</div>
+            <label class="check"><input type="checkbox" id="billing-same" checked> Billing address same as shipping</label>
+            <div class="row" style="margin-top:14px">
+              <button type="button" class="btn" id="back-to-shipping">← Back</button>
+              <span class="spacer"></span>
+              <button type="submit" class="btn btn-primary" id="continue-to-review" data-testid="continue-to-review">Review order</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Step 3: Review -->
+        <section class="card hidden" id="step-3" data-testid="step-review">
+          <h2>Review your order</h2>
+          <div id="order-error" class="alert alert-error hidden" role="alert" data-testid="order-error"></div>
+          <div class="grid grid-2" style="margin-bottom:16px">
+            <div><h3>Ship to <button class="btn btn-link btn-sm" id="edit-shipping">Edit</button></h3><div id="review-address" data-testid="review-address"></div></div>
+            <div><h3>Payment <button class="btn btn-link btn-sm" id="edit-payment">Edit</button></h3><div id="review-payment" data-testid="review-payment"></div></div>
+          </div>
+          <div class="table-wrap">
+            <table class="table" id="review-items" data-testid="review-items">
+              <thead><tr><th>Item</th><th>Qty</th><th class="text-right">Total</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <label class="check" style="margin-top:14px"><input type="checkbox" id="accept-terms" data-testid="accept-terms"> I agree to the terms of sale</label>
+          <div class="field-error" id="accept-terms-error"></div>
+          <div class="row" style="margin-top:14px">
+            <button type="button" class="btn" id="back-to-payment">← Back</button>
+            <span class="spacer"></span>
+            <button type="button" class="btn btn-success btn-lg" id="place-order" data-testid="place-order">Place order</button>
+          </div>
+        </section>
+
+        <!-- Step 4: Confirmation -->
+        <section class="card hidden empty-state" id="step-4" data-testid="step-confirmation">
+          <div class="empty-icon">✅</div>
+          <h2 id="confirmation-title" data-testid="confirmation-title">Thank you for your order!</h2>
+          <p>Your order number is <strong id="order-number" data-testid="order-number"></strong>.</p>
+          <p class="muted">A confirmation email has been sent to <span id="confirmation-email"></span>.</p>
+          <div class="row" style="justify-content:center">
+            <a href="orders.html" class="btn btn-primary" id="view-orders" data-testid="view-orders">View my orders</a>
+            <a href="shop.html" class="btn" id="back-home">Continue shopping</a>
+          </div>
+        </section>
+      </div>
+
+      <aside class="card" id="checkout-summary" aria-label="Order summary" data-testid="checkout-summary">
+        <h2>Order summary</h2>
+        <ul id="summary-items" style="list-style:none;padding:0;margin:0 0 10px"></ul>
+        <div class="summary-line"><span>Subtotal</span><span id="sum-subtotal" data-testid="sum-subtotal"></span></div>
+        <div class="summary-line hidden" id="sum-discount-line" style="color:var(--success)"><span>Discount (<span id="sum-coupon"></span>)</span><span id="sum-discount"></span></div>
+        <div class="summary-line"><span>Shipping</span><span id="sum-shipping" data-testid="sum-shipping"></span></div>
+        <div class="summary-line"><span>Tax</span><span id="sum-tax" data-testid="sum-tax"></span></div>
+        <div class="summary-line summary-total"><span>Total</span><span id="sum-total" data-testid="sum-total"></span></div>
+      </aside>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, $$, money, escapeHtml, Cart, Orders, toast, requireAuth, sleep } = QA;
+      const user = requireAuth();
+      if (!user) return;
+      if (!Cart.items().length) { location.replace('cart.html'); return; }
+
+      const state = { step: 1, shipping: null, payment: null, method: 'standard' };
+      $('#ship-country').innerHTML += QA_DATA.countries.map((c) => `<option value="${c.code}">${c.name}</option>`).join('');
+      $('#shipping-method-options').innerHTML = QA_DATA.shippingMethods.map((m, i) =>
+        `<label class="check"><input type="radio" name="shippingMethod" value="${m.id}" id="ship-${m.id}" ${i === 0 ? 'checked' : ''}> ${m.name} — <span class="ship-price">${money(m.price)}</span></label>`).join('') +
+        `<div class="field-hint">Standard shipping is free on orders of ${money(QA_DATA.FREE_SHIPPING_THRESHOLD)}+.</div>`;
+      $('#ship-email').value = user.email;
+
+      function goTo(step) {
+        state.step = step;
+        [1, 2, 3, 4].forEach((n) => {
+          $('#step-' + n).classList.toggle('hidden', n !== step);
+          const li = $('#step-indicator-' + n);
+          li.className = n === step ? 'active' : n < step ? 'done' : '';
+          if (n === step) li.setAttribute('aria-current', 'step'); else li.removeAttribute('aria-current');
+        });
+        $('#checkout-summary').classList.toggle('hidden', step === 4);
+        window.scrollTo({ top: 0 });
+      }
+
+      function renderSummary() {
+        const t = Cart.totals(state.method);
+        $('#summary-items').innerHTML = t.lines.map((l) =>
+          `<li class="summary-line small"><span>${l.qty} × ${escapeHtml(l.product.name)}</span><span>${money(l.lineTotal)}</span></li>`).join('');
+        $('#sum-subtotal').textContent = money(t.subtotal);
+        $('#sum-discount-line').classList.toggle('hidden', !t.discount);
+        $('#sum-coupon').textContent = t.coupon || '';
+        $('#sum-discount').textContent = '−' + money(t.discount);
+        $('#sum-shipping').textContent = t.shipping ? money(t.shipping) : 'FREE';
+        $('#sum-tax').textContent = money(t.tax);
+        $('#sum-total').textContent = money(t.total);
+        return t;
+      }
+
+      function setErr(id, msg) {
+        $('#' + id + '-error').textContent = msg || '';
+        $('#' + id).classList.toggle('is-invalid', !!msg);
+        return !msg;
+      }
+
+      // ----- Step 1 -----
+      $('#use-saved-address').addEventListener('change', (e) => {
+        const a = user.address;
+        const on = e.target.checked;
+        $('#ship-first-name').value = on ? user.firstName : '';
+        $('#ship-last-name').value = on ? user.lastName : '';
+        $('#ship-street').value = on ? a.street : '';
+        $('#ship-city').value = on ? a.city : '';
+        $('#ship-zip').value = on ? a.zip : '';
+        $('#ship-country').value = on ? a.country : '';
+      });
+      $('#shipping-method-options').addEventListener('change', (e) => { state.method = e.target.value; renderSummary(); });
+
+      $('#shipping-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const v = (id) => $('#' + id).value.trim();
+        const ok = [
+          setErr('ship-first-name', v('ship-first-name') ? '' : 'First name is required'),
+          setErr('ship-last-name', v('ship-last-name') ? '' : 'Last name is required'),
+          setErr('ship-email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('ship-email')) ? '' : 'Please enter a valid email address'),
+          setErr('ship-street', v('ship-street') ? '' : 'Street address is required'),
+          setErr('ship-city', v('ship-city') ? '' : 'City is required'),
+          setErr('ship-zip', !v('ship-zip') ? 'Postal code is required' : /^[A-Za-z0-9 -]{3,10}$/.test(v('ship-zip')) ? '' : 'Please enter a valid postal code'),
+          setErr('ship-country', v('ship-country') ? '' : 'Please select a country')
+        ].every(Boolean);
+        if (!ok) return;
+        state.shipping = {
+          firstName: v('ship-first-name'), lastName: v('ship-last-name'), email: v('ship-email'),
+          street: v('ship-street'), city: v('ship-city'), zip: v('ship-zip'), country: v('ship-country')
+        };
+        goTo(2);
+      });
+
+      // ----- Step 2 -----
+      $('#card-number').addEventListener('input', (e) => {
+        const digits = e.target.value.replace(/\D/g, '').slice(0, 16);
+        e.target.value = digits.replace(/(.{4})/g, '$1 ').trim();
+      });
+      $('#card-expiry').addEventListener('input', (e) => {
+        const d = e.target.value.replace(/\D/g, '').slice(0, 4);
+        e.target.value = d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d;
+      });
+      $$('input[name="paymentMethod"]').forEach((r) => r.addEventListener('change', () => {
+        const m = document.querySelector('input[name="paymentMethod"]:checked').value;
+        $('#card-fields').classList.toggle('hidden', m !== 'card');
+        $('#paypal-fields').classList.toggle('hidden', m !== 'paypal');
+        $('#cod-fields').classList.toggle('hidden', m !== 'cod');
+      }));
+      $('#back-to-shipping').addEventListener('click', () => goTo(1));
+
+      function luhn(num) {
+        let sum = 0;
+        for (let i = 0; i < num.length; i++) {
+          let d = Number(num[num.length - 1 - i]);
+          if (i % 2 === 1) { d *= 2; if (d > 9) d -= 9; }
+          sum += d;
+        }
+        return sum % 10 === 0;
+      }
+
+      $('#payment-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const method = document.querySelector('input[name="paymentMethod"]:checked').value;
+        if (method === 'card') {
+          const name = $('#card-name').value.trim();
+          const num = $('#card-number').value.replace(/\s/g, '');
+          const exp = $('#card-expiry').value;
+          const cvv = $('#card-cvv').value;
+          let expMsg = '';
+          const m = /^(\d{2})\/(\d{2})$/.exec(exp);
+          if (!m) expMsg = 'Enter expiry as MM/YY';
+          else {
+            const month = Number(m[1]);
+            const year = 2000 + Number(m[2]);
+            const now = new Date();
+            if (month < 1 || month > 12) expMsg = 'Invalid month';
+            else if (year < now.getFullYear() || (year === now.getFullYear() && month < now.getMonth() + 1)) expMsg = 'Card has expired';
+          }
+          const ok = [
+            setErr('card-name', name ? '' : 'Name on card is required'),
+            setErr('card-number', !num ? 'Card number is required' : num.length !== 16 || !luhn(num) ? 'Card number is invalid' : ''),
+            setErr('card-expiry', expMsg),
+            setErr('card-cvv', /^\d{3,4}$/.test(cvv) ? '' : 'CVV must be 3 or 4 digits')
+          ].every(Boolean);
+          if (!ok) return;
+          state.payment = { method, name, last4: num.slice(-4), number: num, expiry: exp };
+        } else {
+          state.payment = { method };
+        }
+        renderReview();
+        goTo(3);
+      });
+
+      // ----- Step 3 -----
+      function renderReview() {
+        const s = state.shipping;
+        const country = (QA_DATA.countries.find((c) => c.code === s.country) || {}).name || s.country;
+        $('#review-address').innerHTML = `${escapeHtml(s.firstName)} ${escapeHtml(s.lastName)}<br>${escapeHtml(s.street)}<br>${escapeHtml(s.city)}, ${escapeHtml(s.zip)}<br>${escapeHtml(country)}<br><span class="muted">${escapeHtml(s.email)}</span>`;
+        const p = state.payment;
+        $('#review-payment').innerHTML = p.method === 'card'
+          ? `Card ending in <strong id="review-card-last4">${p.last4}</strong><br>Expires ${escapeHtml(p.expiry)}`
+          : p.method === 'paypal' ? 'PayPal' : 'Cash on delivery';
+        const t = renderSummary();
+        $('#review-items tbody').innerHTML = t.lines.map((l) =>
+          `<tr class="review-item"><td>${escapeHtml(l.product.name)}${l.size ? ' <span class="muted small">(' + l.size + ')</span>' : ''}</td><td>${l.qty}</td><td class="text-right">${money(l.lineTotal)}</td></tr>`).join('');
+        $('#order-error').classList.add('hidden');
+      }
+      $('#back-to-payment').addEventListener('click', () => goTo(2));
+      $('#edit-shipping').addEventListener('click', () => goTo(1));
+      $('#edit-payment').addEventListener('click', () => goTo(2));
+
+      $('#place-order').addEventListener('click', async () => {
+        const err = $('#order-error');
+        err.classList.add('hidden');
+        if (!$('#accept-terms').checked) { $('#accept-terms-error').textContent = 'You must accept the terms of sale'; return; }
+        $('#accept-terms-error').textContent = '';
+        const btn = $('#place-order');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner spinner-sm"></span> Processing…';
+        await sleep(1500);
+        btn.disabled = false;
+        btn.textContent = 'Place order';
+
+        const fail = (msg) => { err.textContent = msg; err.classList.remove('hidden'); };
+        if (user.behavior === 'error') return fail('Something went wrong while processing your order (error code 500). Please try again later.');
+        if (state.payment.method === 'card') {
+          const result = QA_DATA.cards[state.payment.number];
+          if (result === 'declined') return fail('Your card was declined. Please use a different card.');
+          if (result === 'insufficient_funds') return fail('Payment failed: insufficient funds.');
+        }
+
+        const t = Cart.totals(state.method);
+        const id = 'ORD-' + Date.now().toString().slice(-8);
+        Orders.add({
+          id,
+          date: new Date().toISOString(),
+          status: 'Processing',
+          items: t.lines.map((l) => ({ productId: l.productId, name: l.product.name, price: l.product.price, qty: l.qty, size: l.size, color: l.color })),
+          subtotal: t.subtotal, discount: t.discount, coupon: t.coupon, shipping: t.shipping, tax: t.tax, total: t.total,
+          shippingMethod: t.method.name,
+          address: state.shipping,
+          payment: state.payment.method === 'card' ? 'Card •••• ' + state.payment.last4 : state.payment.method === 'paypal' ? 'PayPal' : 'Cash on delivery'
+        });
+        Cart.clear();
+        Cart.setCoupon(null);
+        $('#order-number').textContent = id;
+        $('#confirmation-email').textContent = state.shipping.email;
+        goTo(4);
+        toast('Order placed successfully', 'success');
+      });
+
+      renderSummary();
+      goTo(1);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Window | QA Automation Playground</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body style="padding:24px">
+  <div class="card" style="max-width:480px;margin:0 auto">
+    <h1 id="new-window-heading" data-testid="new-window-heading">This is a new window</h1>
+    <p id="window-info" class="muted"></p>
+    <div class="form-group">
+      <label for="window-input">Send a message back to the opener</label>
+      <input type="text" id="window-input" placeholder="Hello from the new window" data-testid="window-input">
+    </div>
+    <div class="row">
+      <button class="btn btn-primary" id="send-to-opener" data-testid="send-to-opener">Send &amp; close</button>
+      <button class="btn" id="close-window">Close window</button>
+    </div>
+    <p id="window-status" class="small"></p>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const details = [];
+    if (params.get('type')) details.push('type: ' + params.get('type'));
+    if (params.get('n')) details.push('tab #' + params.get('n'));
+    if (params.get('delayed')) details.push('opened after a delay');
+    document.getElementById('window-info').textContent = details.length ? details.join(' · ') : 'Opened from the playground.';
+    if (params.get('n')) document.title = 'New Window ' + params.get('n') + ' | QA Automation Playground';
+
+    document.getElementById('send-to-opener').addEventListener('click', function () {
+      const text = document.getElementById('window-input').value || 'Hello from the new window';
+      if (window.opener) {
+        window.opener.postMessage({ source: 'window', text }, location.origin);
+        window.close();
+      } else {
+        document.getElementById('window-status').textContent = 'No opener found (the link used rel="noopener").';
+      }
+    });
+    document.getElementById('close-window').addEventListener('click', () => window.close());
+  </script>
+</body>
+</html>

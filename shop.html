@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <div class="page-header row">
+      <div>
+        <h1 class="mb-0" id="shop-title">Products</h1>
+        <p id="results-count" data-testid="results-count" aria-live="polite"></p>
+      </div>
+      <span class="spacer"></span>
+      <label for="sort-select" class="muted small">Sort by</label>
+      <select id="sort-select" name="sort" data-testid="sort-select" style="width:auto">
+        <option value="featured">Featured</option>
+        <option value="name-asc">Name (A to Z)</option>
+        <option value="name-desc">Name (Z to A)</option>
+        <option value="price-asc">Price (low to high)</option>
+        <option value="price-desc">Price (high to low)</option>
+        <option value="rating-desc">Rating (high to low)</option>
+      </select>
+      <div class="row" role="group" aria-label="View mode" style="gap:4px">
+        <button class="btn btn-sm" id="view-grid" aria-pressed="true" title="Grid view">▦</button>
+        <button class="btn btn-sm" id="view-list" aria-pressed="false" title="List view">☰</button>
+      </div>
+    </div>
+
+    <div class="shop-layout">
+      <aside class="card" id="filters" aria-label="Product filters" data-testid="filters">
+        <form id="filter-form" onsubmit="return false">
+          <div class="form-group">
+            <label for="search-input">Search</label>
+            <input type="search" id="search-input" name="q" placeholder="Search products…" data-testid="search-input">
+          </div>
+          <fieldset id="category-filter">
+            <legend>Category</legend>
+            <div id="category-options"></div>
+          </fieldset>
+          <fieldset>
+            <legend>Price</legend>
+            <div class="row" style="flex-wrap:nowrap">
+              <input type="number" id="min-price" name="minPrice" placeholder="Min" min="0" aria-label="Minimum price" data-testid="min-price">
+              <span>–</span>
+              <input type="number" id="max-price" name="maxPrice" placeholder="Max" min="0" aria-label="Maximum price" data-testid="max-price">
+            </div>
+          </fieldset>
+          <div class="form-group">
+            <label for="rating-filter">Minimum rating</label>
+            <select id="rating-filter" name="rating">
+              <option value="0">Any rating</option>
+              <option value="4.5">4.5 ★ &amp; up</option>
+              <option value="4">4 ★ &amp; up</option>
+              <option value="3">3 ★ &amp; up</option>
+            </select>
+          </div>
+          <label class="check"><input type="checkbox" id="in-stock-only" name="inStock"> In stock only</label>
+          <label class="check"><input type="checkbox" id="on-sale-only" name="onSale"> On sale</label>
+          <button type="button" class="btn btn-block" id="clear-filters" style="margin-top:12px" data-testid="clear-filters">Clear filters</button>
+        </form>
+      </aside>
+
+      <section aria-label="Product results">
+        <div id="loading" class="empty-state hidden" data-testid="loading"><span class="spinner"></span><p>Loading products…</p></div>
+        <div id="product-grid" class="grid grid-4" data-testid="product-grid"></div>
+        <div id="no-results" class="empty-state hidden" data-testid="no-results">
+          <div class="empty-icon">🔍</div>
+          <p>No products match your filters.</p>
+        </div>
+        <nav aria-label="Pagination"><ul class="pagination" id="pagination" data-testid="pagination"></ul></nav>
+      </section>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, $$, money, escapeHtml, stars, Cart, toast, productImage, requireAuth, sleep } = QA;
+      const user = requireAuth();
+      if (!user) return;
+      const problem = user.behavior === 'problem';
+      const PAGE_SIZE = 8;
+      let page = 1;
+      let view = 'grid';
+
+      // Category checkboxes
+      $('#category-options').innerHTML = QA_DATA.categories.map((c) => {
+        const count = QA_DATA.products.filter((p) => p.category === c).length;
+        const id = 'cat-' + c.toLowerCase();
+        return `<label class="check" for="${id}"><input type="checkbox" id="${id}" name="category" value="${c}"> ${c} <span class="muted small">(${count})</span></label>`;
+      }).join('');
+
+      // Restore filters from the URL, so filtered views are linkable
+      const params = new URLSearchParams(location.search);
+      $('#search-input').value = params.get('q') || '';
+      $('#sort-select').value = params.get('sort') || 'featured';
+      (params.get('category') || '').split(',').filter(Boolean).forEach((c) => {
+        const cb = document.getElementById('cat-' + c.toLowerCase());
+        if (cb) cb.checked = true;
+      });
+      page = Number(params.get('page')) || 1;
+
+      function filters() {
+        return {
+          q: $('#search-input').value.trim().toLowerCase(),
+          cats: $$('input[name="category"]:checked').map((c) => c.value),
+          min: parseFloat($('#min-price').value),
+          max: parseFloat($('#max-price').value),
+          rating: parseFloat($('#rating-filter').value),
+          inStock: $('#in-stock-only').checked,
+          onSale: $('#on-sale-only').checked,
+          sort: $('#sort-select').value
+        };
+      }
+
+      function filtered() {
+        const f = filters();
+        let list = QA_DATA.products.filter((p) =>
+          (!f.q || p.name.toLowerCase().includes(f.q) || p.description.toLowerCase().includes(f.q)) &&
+          (!f.cats.length || f.cats.includes(p.category)) &&
+          (isNaN(f.min) || p.price >= f.min) &&
+          (isNaN(f.max) || p.price <= f.max) &&
+          p.rating >= f.rating &&
+          (!f.inStock || p.stock > 0) &&
+          (!f.onSale || !!p.oldPrice)
+        );
+        // problem_user: sorting silently does nothing
+        if (!problem) {
+          const sorters = {
+            'name-asc': (a, b) => a.name.localeCompare(b.name),
+            'name-desc': (a, b) => b.name.localeCompare(a.name),
+            'price-asc': (a, b) => a.price - b.price,
+            'price-desc': (a, b) => b.price - a.price,
+            'rating-desc': (a, b) => b.rating - a.rating
+          };
+          if (sorters[f.sort]) list = list.slice().sort(sorters[f.sort]);
+        }
+        return list;
+      }
+
+      function syncUrl() {
+        const f = filters();
+        const p = new URLSearchParams();
+        if (f.q) p.set('q', $('#search-input').value.trim());
+        if (f.cats.length) p.set('category', f.cats.join(','));
+        if (f.sort !== 'featured') p.set('sort', f.sort);
+        if (page > 1) p.set('page', page);
+        const qs = p.toString();
+        history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+      }
+
+      function cardHtml(p) {
+        const inCart = Cart.has(p.id);
+        const out = p.stock === 0;
+        return `
+          <article class="product-card" data-product-id="${p.id}" data-testid="product-card" data-category="${p.category}">
+            <a href="product.html?id=${p.id}" id="product-image-link-${p.id}" tabindex="-1">${productImage(p)}</a>
+            <div class="product-body">
+              <span class="muted small product-category">${p.category}</span>
+              <a href="product.html?id=${p.id}" class="product-name" id="product-name-${p.id}" data-testid="product-name">${escapeHtml(p.name)}</a>
+              <div class="rating" aria-label="Rated ${p.rating} out of 5">${stars(p.rating)} <span class="muted small">(${p.reviews})</span></div>
+              <p class="product-desc">${escapeHtml(p.description)}</p>
+              <div class="row">
+                <span class="product-price" data-testid="product-price">${money(p.price)}${p.oldPrice ? `<span class="old-price">${money(p.oldPrice)}</span>` : ''}</span>
+                <span class="spacer"></span>
+                ${out
+                  ? `<button class="btn btn-sm" disabled id="add-to-cart-${p.slug}" data-testid="add-to-cart">Out of stock</button>`
+                  : inCart
+                    ? `<button class="btn btn-sm btn-outline-danger" id="remove-${p.slug}" data-action="remove" data-id="${p.id}" data-testid="remove-from-cart">Remove</button>`
+                    : `<button class="btn btn-sm btn-primary" id="add-to-cart-${p.slug}" data-action="add" data-id="${p.id}" data-testid="add-to-cart">Add to cart</button>`}
+              </div>
+            </div>
+          </article>`;
+      }
+
+      function render() {
+        const list = filtered();
+        const pages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+        if (page > pages) page = pages;
+        const slice = list.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+        const grid = $('#product-grid');
+        grid.className = view === 'grid' ? 'grid grid-4' : 'grid product-list';
+        grid.innerHTML = slice.map(cardHtml).join('');
+        $('#no-results').classList.toggle('hidden', list.length > 0);
+        const from = list.length ? (page - 1) * PAGE_SIZE + 1 : 0;
+        $('#results-count').textContent = `Showing ${from}–${Math.min(page * PAGE_SIZE, list.length)} of ${list.length} products`;
+
+        const pag = $('#pagination');
+        pag.innerHTML = pages <= 1 ? '' : `
+          <li><button class="btn btn-sm" id="prev-page" data-page="${page - 1}" ${page === 1 ? 'disabled' : ''} aria-label="Previous page">‹ Prev</button></li>
+          ${Array.from({ length: pages }, (_, i) => `<li><button class="btn btn-sm${i + 1 === page ? ' active' : ''}" data-page="${i + 1}" ${i + 1 === page ? 'aria-current="page"' : ''} aria-label="Page ${i + 1}">${i + 1}</button></li>`).join('')}
+          <li><button class="btn btn-sm" id="next-page" data-page="${page + 1}" ${page === pages ? 'disabled' : ''} aria-label="Next page">Next ›</button></li>`;
+        syncUrl();
+      }
+
+      $('#product-grid').addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-action]');
+        if (!btn) return;
+        const id = Number(btn.dataset.id);
+        const p = QA.getProduct(id);
+        if (btn.dataset.action === 'add') {
+          // problem_user: products with an even id can't be added (fails silently)
+          if (problem && id % 2 === 0) return;
+          Cart.add(id, 1, { size: p.sizes ? p.sizes[0] : null, color: p.colors ? p.colors[0] : null });
+          toast(`"${p.name}" added to cart`, 'success');
+        } else {
+          Cart.removeProduct(id);
+          toast(`"${p.name}" removed from cart`);
+        }
+        render();
+      });
+      $('#pagination').addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-page]');
+        if (!btn || btn.disabled) return;
+        page = Number(btn.dataset.page);
+        render();
+        window.scrollTo({ top: 0 });
+      });
+
+      let debounce;
+      $('#search-input').addEventListener('input', () => { clearTimeout(debounce); debounce = setTimeout(() => { page = 1; render(); }, 300); });
+      $('#filter-form').addEventListener('change', (e) => { if (e.target.id !== 'search-input') { page = 1; render(); } });
+      $('#sort-select').addEventListener('change', () => { page = 1; render(); });
+      $('#clear-filters').addEventListener('click', () => { $('#filter-form').reset(); page = 1; render(); });
+      $('#view-grid').addEventListener('click', () => { view = 'grid'; $('#view-grid').setAttribute('aria-pressed', 'true'); $('#view-list').setAttribute('aria-pressed', 'false'); render(); });
+      $('#view-list').addEventListener('click', () => { view = 'list'; $('#view-list').setAttribute('aria-pressed', 'true'); $('#view-grid').setAttribute('aria-pressed', 'false'); render(); });
+
+      (async function init() {
+        if (user.behavior === 'slow') {
+          $('#loading').classList.remove('hidden');
+          await sleep(3000);
+          $('#loading').classList.add('hidden');
+        }
+        render();
+      })();
+    })();
+  </script>
+</body>
+</html>

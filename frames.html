@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frames, Windows &amp; Shadow DOM | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    iframe { width: 100%; border: 1px solid var(--border); border-radius: 6px; background: #fff; }
+  </style>
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <div class="page-header">
+      <h1>Frames, windows &amp; Shadow DOM</h1>
+      <p>Switch context into iframes, handle new tabs and pop-up windows, and pierce shadow roots.</p>
+    </div>
+    <nav class="toc" aria-label="On this page">
+      <a href="#iframes">Iframe</a><a href="#nested-frames">Nested frames</a><a href="#srcdoc-frame">srcdoc frame</a>
+      <a href="#windows">Windows &amp; tabs</a><a href="#shadow-dom">Shadow DOM</a>
+    </nav>
+
+    <!-- ============ IFRAME ============ -->
+    <section class="section card" id="iframes">
+      <h2>Iframe with a form</h2>
+      <p class="section-desc">Fill the form inside the frame. Messages sent from the frame appear below (via <code>postMessage</code>).</p>
+      <iframe src="frames/frame-form.html" id="form-frame" name="formFrame" title="Form frame" height="260" data-testid="form-frame"></iframe>
+      <p class="small">Message from frame: <strong id="frame-message" data-testid="frame-message">—</strong></p>
+    </section>
+
+    <!-- ============ NESTED ============ -->
+    <section class="section card" id="nested-frames">
+      <h2>Nested frames</h2>
+      <p class="section-desc">Parent frame contains a child frame. Switch into the parent, then into the child.</p>
+      <iframe src="frames/frame-parent.html" id="parent-frame" name="parentFrame" title="Parent frame" height="280" data-testid="parent-frame"></iframe>
+      <h3 style="margin-top:16px">Side-by-side frames</h3>
+      <div class="grid grid-3">
+        <iframe srcdoc="<body style='font-family:sans-serif;background:#ffe3e3;margin:0;padding:16px'><h3 id='frame-title'>LEFT</h3></body>" name="frame-left" id="frame-left" title="Left frame" height="100"></iframe>
+        <iframe srcdoc="<body style='font-family:sans-serif;background:#d3f9d8;margin:0;padding:16px'><h3 id='frame-title'>MIDDLE</h3></body>" name="frame-middle" id="frame-middle" title="Middle frame" height="100"></iframe>
+        <iframe srcdoc="<body style='font-family:sans-serif;background:#dbe4ff;margin:0;padding:16px'><h3 id='frame-title'>RIGHT</h3></body>" name="frame-right" id="frame-right" title="Right frame" height="100"></iframe>
+      </div>
+    </section>
+
+    <!-- ============ SRCDOC ============ -->
+    <section class="section card" id="srcdoc-frame">
+      <h2>Rich text editor in a frame</h2>
+      <p class="section-desc">A <code>contenteditable</code> body inside an iframe, like TinyMCE and similar editors.</p>
+      <iframe id="editor-frame" title="Rich text editor" height="160" data-testid="editor-frame"
+        srcdoc="<html><body id='editor' contenteditable='true' style='font-family:sans-serif;padding:12px;margin:0;min-height:120px'><p>Your content goes here.</p></body></html>"></iframe>
+      <button class="btn btn-sm" id="read-editor" style="margin-top:8px">Read editor content</button>
+      <div class="output" id="editor-output" style="margin-top:8px" data-testid="editor-output"></div>
+    </section>
+
+    <!-- ============ WINDOWS ============ -->
+    <section class="section card" id="windows">
+      <h2>Windows &amp; tabs</h2>
+      <p class="section-desc">Switch between window handles, verify the new page title, close it and return.</p>
+      <div class="row">
+        <a href="frames/new-window.html" target="_blank" class="btn btn-primary" id="new-tab-link" data-testid="new-tab-link">Open new tab (link)</a>
+        <button class="btn" id="new-tab-btn" data-testid="new-tab-btn">Open new tab (JS)</button>
+        <button class="btn" id="new-window-btn" data-testid="new-window-btn">Open new window (popup)</button>
+        <button class="btn" id="multiple-windows-btn">Open 3 tabs</button>
+        <button class="btn" id="delayed-tab-btn">Open tab after 3 seconds</button>
+      </div>
+      <p class="small">Messages from child windows: <strong id="window-message" data-testid="window-message">—</strong></p>
+    </section>
+
+    <!-- ============ SHADOW DOM ============ -->
+    <section class="section card" id="shadow-dom">
+      <h2>Shadow DOM</h2>
+      <p class="section-desc">Elements inside shadow roots can't be found with regular selectors from the document. Playwright pierces open shadow roots automatically; Selenium needs <code>getShadowRoot()</code>; Cypress needs <code>{ includeShadowDom: true }</code>.</p>
+      <div class="grid grid-2">
+        <div>
+          <h3>Open shadow root</h3>
+          <qa-login-card id="shadow-host" data-testid="shadow-host"></qa-login-card>
+        </div>
+        <div>
+          <h3>Nested shadow roots</h3>
+          <qa-outer-card id="nested-shadow-host"></qa-outer-card>
+          <h3 style="margin-top:16px">Closed shadow root</h3>
+          <qa-closed-card id="closed-shadow-host"></qa-closed-card>
+          <p class="small muted">Closed roots can't be accessed via <code>element.shadowRoot</code> — interact through coordinates or keyboard.</p>
+        </div>
+      </div>
+      <p class="small">Shadow DOM result: <strong id="shadow-result" data-testid="shadow-result">—</strong></p>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $ } = QA;
+
+      // Messages from frames and child windows (same origin only)
+      window.addEventListener('message', (e) => {
+        if (e.origin !== location.origin || !e.data || typeof e.data !== 'object') return;
+        if (e.data.source === 'frame') $('#frame-message').textContent = e.data.text;
+        if (e.data.source === 'window') $('#window-message').textContent = e.data.text;
+      });
+
+      $('#read-editor').addEventListener('click', () => {
+        const doc = $('#editor-frame').contentDocument;
+        $('#editor-output').textContent = doc ? doc.body.innerText : 'Could not access frame';
+      });
+
+      // Windows
+      $('#new-tab-btn').addEventListener('click', () => window.open('frames/new-window.html', '_blank'));
+      $('#new-window-btn').addEventListener('click', () => window.open('frames/new-window.html?type=popup', 'qaPopup', 'width=520,height=420'));
+      $('#multiple-windows-btn').addEventListener('click', () => {
+        [1, 2, 3].forEach((n) => window.open('frames/new-window.html?n=' + n, '_blank'));
+      });
+      $('#delayed-tab-btn').addEventListener('click', () => {
+        // Opened before the delay so popup blockers allow it, then navigated after 3s.
+        const w = window.open('about:blank', '_blank');
+        setTimeout(() => { if (w) w.location.href = 'frames/new-window.html?delayed=1'; }, 3000);
+      });
+
+      // ---------- Shadow DOM components ----------
+      const baseStyle = `
+        :host { display:block; font-family: system-ui, sans-serif; }
+        .box { border:1px solid #d8dde8; border-radius:8px; padding:14px; background:#fff; }
+        input { width:100%; padding:8px 10px; border:1px solid #d8dde8; border-radius:6px; font:inherit; box-sizing:border-box; margin-bottom:8px; }
+        button { padding:8px 14px; border-radius:6px; border:0; background:#3b5bdb; color:#fff; font-weight:600; cursor:pointer; font:inherit; }
+        label { display:block; font-size:.85rem; font-weight:600; margin-bottom:4px; }
+        p { margin: 8px 0 0; }`;
+      const report = (text) => { $('#shadow-result').textContent = text; };
+
+      class QaLoginCard extends HTMLElement {
+        connectedCallback() {
+          const root = this.attachShadow({ mode: 'open' });
+          root.innerHTML = `<style>${baseStyle}</style>
+            <div class="box">
+              <label for="shadow-username">Username</label>
+              <input type="text" id="shadow-username" name="username" placeholder="Username inside shadow DOM" data-testid="shadow-username">
+              <label for="shadow-password">Password</label>
+              <input type="password" id="shadow-password" name="password" placeholder="Password" data-testid="shadow-password">
+              <button id="shadow-submit" data-testid="shadow-submit">Sign in</button>
+              <p id="shadow-message"></p>
+            </div>`;
+          root.getElementById('shadow-submit').addEventListener('click', () => {
+            const u = root.getElementById('shadow-username').value;
+            const msg = u ? `Welcome, ${u}!` : 'Username is required';
+            root.getElementById('shadow-message').textContent = msg;
+            report('Open shadow: ' + msg);
+          });
+        }
+      }
+      class QaInnerCard extends HTMLElement {
+        connectedCallback() {
+          const root = this.attachShadow({ mode: 'open' });
+          root.innerHTML = `<style>${baseStyle}</style>
+            <div class="box" style="background:#f3f0ff">
+              <span id="inner-text">I'm two shadow roots deep.</span>
+              <p><button id="inner-button" data-testid="inner-button">Inner button</button></p>
+            </div>`;
+          root.getElementById('inner-button').addEventListener('click', () => report('Nested shadow: inner button clicked'));
+        }
+      }
+      class QaOuterCard extends HTMLElement {
+        connectedCallback() {
+          const root = this.attachShadow({ mode: 'open' });
+          root.innerHTML = `<style>${baseStyle}</style>
+            <div class="box">
+              <span id="outer-text">Outer shadow root</span>
+              <p><qa-inner-card id="inner-host"></qa-inner-card></p>
+            </div>`;
+        }
+      }
+      class QaClosedCard extends HTMLElement {
+        connectedCallback() {
+          const root = this.attachShadow({ mode: 'closed' });
+          root.innerHTML = `<style>${baseStyle}</style>
+            <div class="box"><button id="closed-button">Button in closed shadow root</button></div>`;
+          root.getElementById('closed-button').addEventListener('click', () => report('Closed shadow: button clicked'));
+        }
+      }
+      customElements.define('qa-login-card', QaLoginCard);
+      customElements.define('qa-inner-card', QaInnerCard);
+      customElements.define('qa-outer-card', QaOuterCard);
+      customElements.define('qa-closed-card', QaClosedCard);
+    })();
+  </script>
+</body>
+</html>

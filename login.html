@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <div class="auth-wrap">
+      <div class="card">
+        <h1 id="login-title">Log in</h1>
+        <p class="muted">Use one of the <a href="index.html#credentials">test accounts</a>. Password for all: <code>Password123!</code></p>
+
+        <div id="login-info" class="alert alert-info hidden" role="status" data-testid="login-info"></div>
+        <div id="login-error" class="alert alert-error hidden" role="alert" data-testid="login-error">
+          <span id="login-error-message"></span>
+          <button type="button" class="alert-close" id="login-error-close" aria-label="Dismiss error">×</button>
+        </div>
+
+        <form id="login-form" name="loginForm" novalidate data-testid="login-form">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Username"
+                   autocomplete="username" data-testid="username" aria-describedby="username-error">
+            <div class="field-error" id="username-error"></div>
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-group">
+              <input type="password" id="password" name="password" class="form-control" placeholder="Password"
+                     autocomplete="current-password" data-testid="password" aria-describedby="password-error">
+              <button type="button" class="btn" id="toggle-password" aria-label="Show password" aria-pressed="false">👁</button>
+            </div>
+            <div class="field-error" id="password-error"></div>
+          </div>
+          <div class="row" style="margin-bottom:16px">
+            <label class="check mb-0"><input type="checkbox" id="remember-me" name="remember"> Remember me</label>
+            <span class="spacer"></span>
+            <a href="#" id="forgot-password-link">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block btn-lg" id="login-button" data-testid="login-button">
+            <span class="btn-label">Log in</span>
+          </button>
+        </form>
+
+        <div id="forgot-panel" class="hidden" style="margin-top:16px" data-testid="forgot-panel">
+          <hr>
+          <h3>Reset password</h3>
+          <form id="forgot-form" novalidate>
+            <div class="form-group">
+              <label for="reset-email">Email address</label>
+              <input type="email" id="reset-email" name="email" placeholder="you@example.com">
+              <div class="field-error" id="reset-email-error"></div>
+            </div>
+            <button type="submit" class="btn" id="reset-button">Send reset link</button>
+          </form>
+          <div id="reset-result" class="alert alert-success hidden" role="status" style="margin-top:12px"></div>
+        </div>
+
+        <hr>
+        <p class="mb-0">Don't have an account? <a href="register.html" id="register-link">Create one</a></p>
+      </div>
+    </div>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, param, login, currentUser, Store, KEYS, allUsers } = QA;
+      const form = $('#login-form');
+      const btn = $('#login-button');
+      const errorBox = $('#login-error');
+      const info = $('#login-info');
+
+      // Only allow redirects to local pages (e.g. "cart.html" or "product.html?id=3").
+      const rawRedirect = param('redirect');
+      const redirect = rawRedirect && /^[\w-]+\.html(\?[\w=&%-]*)?$/.test(rawRedirect) ? rawRedirect : null;
+      if (currentUser() && !param('logged_out')) {
+        location.replace(redirect || 'shop.html');
+        return;
+      }
+      if (param('logged_out')) { info.textContent = 'You have been logged out.'; info.classList.remove('hidden'); }
+      else if (param('registered')) { info.textContent = 'Account created! You can now log in as ' + param('registered') + '.'; info.classList.remove('hidden'); }
+      else if (redirect) { info.textContent = 'Please log in to continue.'; info.classList.remove('hidden'); }
+
+      const remembered = Store.get(KEYS.lastUser, null);
+      if (remembered) { $('#username').value = remembered; $('#remember-me').checked = true; }
+
+      function showError(msg) {
+        $('#login-error-message').textContent = msg;
+        errorBox.classList.remove('hidden');
+      }
+      function clearErrors() {
+        errorBox.classList.add('hidden');
+        ['username', 'password'].forEach((f) => { $('#' + f).classList.remove('is-invalid'); $('#' + f + '-error').textContent = ''; });
+      }
+
+      $('#login-error-close').addEventListener('click', () => errorBox.classList.add('hidden'));
+
+      $('#toggle-password').addEventListener('click', function () {
+        const input = $('#password');
+        const show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        this.setAttribute('aria-pressed', show);
+        this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        clearErrors();
+        const username = $('#username').value.trim();
+        const password = $('#password').value;
+        let invalid = false;
+        if (!username) { $('#username').classList.add('is-invalid'); $('#username-error').textContent = 'Username is required'; invalid = true; }
+        if (!password) { $('#password').classList.add('is-invalid'); $('#password-error').textContent = 'Password is required'; invalid = true; }
+        if (invalid) { showError(!username ? 'Username is required' : 'Password is required'); return; }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner spinner-sm" id="login-spinner"></span> <span class="btn-label">Logging in…</span>';
+        const result = await login(username, password, $('#remember-me').checked);
+        if (result.ok) {
+          location.href = redirect || 'shop.html';
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = '<span class="btn-label">Log in</span>';
+          $('#username').classList.add('is-invalid');
+          $('#password').classList.add('is-invalid');
+          showError(result.error);
+        }
+      });
+
+      $('#forgot-password-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        $('#forgot-panel').classList.toggle('hidden');
+        $('#reset-email').focus();
+      });
+      $('#forgot-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = $('#reset-email').value.trim();
+        const err = $('#reset-email-error');
+        const result = $('#reset-result');
+        result.classList.add('hidden');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Please enter a valid email address'; return; }
+        err.textContent = '';
+        const exists = allUsers().some((u) => u.email.toLowerCase() === email.toLowerCase());
+        result.className = 'alert hidden ' + (exists ? 'alert-success' : 'alert-warning');
+        result.textContent = exists
+          ? 'A reset link has been sent to ' + email + '.'
+          : 'No account found with that email address.';
+        result.classList.remove('hidden');
+      });
+    })();
+  </script>
+</body>
+</html>

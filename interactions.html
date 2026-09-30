@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactions | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <div class="page-header">
+      <h1>Interactions</h1>
+      <p>Browser dialogs, modals, mouse actions, drag &amp; drop, keyboard and scrolling.</p>
+    </div>
+    <nav class="toc" aria-label="On this page">
+      <a href="#js-alerts">JS alerts</a><a href="#modals">Modals</a><a href="#tabs-accordion">Tabs &amp; accordion</a>
+      <a href="#hover">Hover</a><a href="#drag-drop">Drag &amp; drop</a><a href="#mouse">Mouse actions</a>
+      <a href="#keyboard">Keyboard</a><a href="#scrolling">Scrolling</a><a href="#slider">Slider</a>
+    </nav>
+
+    <!-- ============ ALERTS ============ -->
+    <section class="section card" id="js-alerts">
+      <h2>JavaScript alerts</h2>
+      <p class="section-desc">Native dialogs block the page. Your tool must accept, dismiss or type into them.</p>
+      <div class="row">
+        <button class="btn" id="alert-btn" data-testid="alert-btn">JS Alert</button>
+        <button class="btn" id="confirm-btn" data-testid="confirm-btn">JS Confirm</button>
+        <button class="btn" id="prompt-btn" data-testid="prompt-btn">JS Prompt</button>
+        <button class="btn" id="delayed-alert-btn" data-testid="delayed-alert-btn">Alert after 5 seconds</button>
+      </div>
+      <p style="margin-top:12px">Result: <strong id="alert-result" data-testid="alert-result">—</strong></p>
+    </section>
+
+    <!-- ============ MODALS ============ -->
+    <section class="section card" id="modals">
+      <h2>Modals</h2>
+      <div class="row">
+        <button class="btn btn-primary" id="open-small-modal" data-testid="open-small-modal">Small modal</button>
+        <button class="btn" id="open-large-modal" data-testid="open-large-modal">Large scrollable modal</button>
+        <button class="btn" id="open-native-dialog" data-testid="open-native-dialog">Native &lt;dialog&gt;</button>
+        <button class="btn" id="open-delayed-modal">Modal with delayed content</button>
+      </div>
+      <p style="margin-top:12px">Last modal action: <strong id="modal-result" data-testid="modal-result">—</strong></p>
+      <div class="alert alert-warning" id="dismissible-alert" role="alert" style="margin-top:12px">
+        This is a dismissible inline alert.
+        <button class="alert-close" id="close-inline-alert" aria-label="Close alert">×</button>
+      </div>
+    </section>
+
+    <!-- ============ TABS / ACCORDION ============ -->
+    <section class="section card" id="tabs-accordion">
+      <h2>Tabs &amp; accordion</h2>
+      <div class="grid grid-2">
+        <div>
+          <div class="tabs" role="tablist" id="demo-tabs" aria-label="Demo tabs">
+            <button class="tab" role="tab" aria-selected="true" aria-controls="tabpanel-1" id="tab-1">What</button>
+            <button class="tab" role="tab" aria-selected="false" aria-controls="tabpanel-2" id="tab-2" tabindex="-1">Why</button>
+            <button class="tab" role="tab" aria-selected="false" aria-controls="tabpanel-3" id="tab-3" tabindex="-1">How</button>
+            <button class="tab" role="tab" aria-selected="false" disabled id="tab-4">Disabled</button>
+          </div>
+          <div role="tabpanel" id="tabpanel-1" aria-labelledby="tab-1"><p>Test automation uses software to run tests and compare actual outcomes with expected ones.</p></div>
+          <div role="tabpanel" id="tabpanel-2" aria-labelledby="tab-2" hidden><p>It gives fast feedback, reduces repetitive manual work and catches regressions early.</p></div>
+          <div role="tabpanel" id="tabpanel-3" aria-labelledby="tab-3" hidden><p>Pick a tool, design stable locators, keep tests independent and run them in CI.</p></div>
+          <p class="small muted">Tip: tabs support ← → arrow keys.</p>
+        </div>
+        <div id="accordion">
+          <div class="accordion-item">
+            <button class="accordion-header" aria-expanded="true" aria-controls="acc-panel-1" id="acc-header-1">What is a locator?</button>
+            <div class="accordion-panel" id="acc-panel-1">A locator is a way to find an element on the page, such as a CSS selector or XPath expression.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-header" aria-expanded="false" aria-controls="acc-panel-2" id="acc-header-2">What is an explicit wait?</button>
+            <div class="accordion-panel" id="acc-panel-2" hidden>A wait that polls for a specific condition, such as visibility, before continuing.</div>
+          </div>
+          <div class="accordion-item">
+            <button class="accordion-header" aria-expanded="false" aria-controls="acc-panel-3" id="acc-header-3">What is the Page Object Model?</button>
+            <div class="accordion-panel" id="acc-panel-3" hidden>A design pattern that wraps each page in a class exposing its elements and actions.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HOVER ============ -->
+    <section class="section card" id="hover">
+      <h2>Hover</h2>
+      <div class="row" style="align-items:flex-start;gap:28px">
+        <div>
+          <h3>Tooltip</h3>
+          <span class="tooltip-wrap"><button class="btn" id="tooltip-btn" aria-describedby="tooltip-text">Hover over me</button><span class="tooltip" role="tooltip" id="tooltip-text">You hovered the button!</span></span>
+          <span class="tooltip-wrap" style="margin-left:10px"><input type="text" placeholder="Focus or hover" aria-describedby="tooltip-input" style="width:160px"><span class="tooltip" role="tooltip" id="tooltip-input">Input tooltip</span></span>
+          <p style="margin-top:16px"><abbr title="Document Object Model" id="abbr-dom">DOM</abbr> uses the native <code>title</code> attribute.</p>
+        </div>
+        <div>
+          <h3>Multi-level menu</h3>
+          <ul class="hover-menu" id="hover-menu">
+            <li><a href="#hover" id="menu-item-1">Products</a>
+              <ul>
+                <li><a href="#hover">Laptops</a></li>
+                <li><a href="#hover" id="menu-phones">Phones ›</a>
+                  <ul>
+                    <li><a href="#hover" id="menu-android">Android</a></li>
+                    <li><a href="#hover" id="menu-ios">iOS</a></li>
+                  </ul>
+                </li>
+                <li><a href="#hover">Tablets</a></li>
+              </ul>
+            </li>
+            <li><a href="#hover" id="menu-item-2">Services</a>
+              <ul><li><a href="#hover">Consulting</a></li><li><a href="#hover">Training</a></li></ul>
+            </li>
+            <li><a href="#hover" id="menu-item-3">About</a></li>
+          </ul>
+          <p class="small">Clicked: <strong id="menu-result">—</strong></p>
+        </div>
+        <div>
+          <h3>Hover cards</h3>
+          <div class="row">
+            <div class="hover-card"><div class="avatar" style="width:64px;height:64px;font-size:1.3rem">U1</div><div class="hover-reveal"><strong>user1</strong><br><a href="#hover">View profile</a></div></div>
+            <div class="hover-card"><div class="avatar" style="width:64px;height:64px;font-size:1.3rem">U2</div><div class="hover-reveal"><strong>user2</strong><br><a href="#hover">View profile</a></div></div>
+            <div class="hover-card"><div class="avatar" style="width:64px;height:64px;font-size:1.3rem">U3</div><div class="hover-reveal"><strong>user3</strong><br><a href="#hover">View profile</a></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-box" id="hover-box" style="margin-top:16px;text-align:center">Mouse over this box: <strong id="hover-status" data-testid="hover-status">not hovered</strong></div>
+    </section>
+
+    <!-- ============ DRAG & DROP ============ -->
+    <section class="section card" id="drag-drop">
+      <h2>Drag &amp; drop</h2>
+      <div class="grid grid-3">
+        <div>
+          <h3>HTML5 drag &amp; drop</h3>
+          <div class="row" style="margin-bottom:10px">
+            <div class="draggable" draggable="true" id="draggable" data-testid="draggable">Drag me</div>
+          </div>
+          <div class="drop-zone" id="droppable" data-testid="droppable">Drop here</div>
+        </div>
+        <div>
+          <h3>Sortable list</h3>
+          <ul class="sortable-list" id="sortable-list" data-testid="sortable-list">
+            <li draggable="true" data-item="1">1. Plan</li>
+            <li draggable="true" data-item="2">2. Design</li>
+            <li draggable="true" data-item="3">3. Build</li>
+            <li draggable="true" data-item="4">4. Test</li>
+            <li draggable="true" data-item="5">5. Release</li>
+          </ul>
+          <p class="small">Order: <span id="sort-order" data-testid="sort-order"></span></p>
+        </div>
+        <div>
+          <h3>Move between lists</h3>
+          <div class="grid" style="grid-template-columns:1fr 1fr;gap:8px">
+            <ul class="sortable-list drop-list" id="todo-list" data-list="todo" style="min-height:120px;background:var(--surface-2);padding:6px;border-radius:6px">
+              <li draggable="true" id="card-a">Card A</li>
+              <li draggable="true" id="card-b">Card B</li>
+              <li draggable="true" id="card-c">Card C</li>
+            </ul>
+            <ul class="sortable-list drop-list" id="done-list" data-list="done" style="min-height:120px;background:var(--success-bg);padding:6px;border-radius:6px"></ul>
+          </div>
+          <p class="small">To do: <span id="todo-count">3</span> · Done: <span id="done-count">0</span></p>
+        </div>
+      </div>
+      <h3 style="margin-top:16px">Free drag (mouse events)</h3>
+      <p class="section-desc">This box uses mousedown/mousemove/mouseup, so it works with "drag by offset" actions.</p>
+      <div class="drag-area" id="drag-area"><div class="free-box" id="free-box" data-testid="free-box">Drag</div></div>
+      <p class="small">Position: <span id="box-position" data-testid="box-position">x: 20, y: 20</span></p>
+    </section>
+
+    <!-- ============ MOUSE ============ -->
+    <section class="section card" id="mouse">
+      <h2>Mouse actions</h2>
+      <div class="grid grid-2">
+        <div>
+          <h3>Custom context menu</h3>
+          <div class="demo-box" id="context-area" data-testid="context-area" style="text-align:center;padding:40px 16px">Right-click inside this box</div>
+          <p class="small">Selected: <strong id="context-result" data-testid="context-result">—</strong></p>
+        </div>
+        <div>
+          <h3>Click-and-hold</h3>
+          <button class="btn btn-lg" id="hold-btn" data-testid="hold-btn">Press and hold for 2 seconds</button>
+          <div class="progress" style="margin-top:10px"><div class="progress-bar" id="hold-progress" style="width:0"></div></div>
+          <p class="small">Status: <strong id="hold-result" data-testid="hold-result">—</strong></p>
+          <h3>Mouse position</h3>
+          <div class="demo-box" id="mouse-tracker" style="height:80px">Move here: <span id="mouse-coords">x: 0, y: 0</span></div>
+        </div>
+      </div>
+      <ul class="context-menu hidden" id="context-menu" role="menu">
+        <li role="menuitem" data-action="copy">📋 Copy</li>
+        <li role="menuitem" data-action="paste">📥 Paste</li>
+        <li role="menuitem" data-action="rename">✏️ Rename</li>
+        <li role="menuitem" data-action="delete">🗑️ Delete</li>
+      </ul>
+    </section>
+
+    <!-- ============ KEYBOARD ============ -->
+    <section class="section card" id="keyboard">
+      <h2>Keyboard</h2>
+      <div class="grid grid-2">
+        <div>
+          <label for="key-input" class="form-label">Press any key in this input</label>
+          <input type="text" id="key-input" data-testid="key-input" placeholder="Focus me and press keys">
+          <p class="small">You pressed: <strong id="key-result" data-testid="key-result">—</strong></p>
+          <p class="small">Modifiers: <strong id="key-modifiers">—</strong></p>
+        </div>
+        <div>
+          <label for="copy-source" class="form-label">Copy / paste (Ctrl+A, Ctrl+C, Ctrl+V)</label>
+          <input type="text" id="copy-source" value="Copy this text" style="margin-bottom:8px">
+          <input type="text" id="copy-target" placeholder="Paste here" data-testid="copy-target">
+          <p class="small">Global shortcut: press <kbd>Shift</kbd> + <kbd>K</kbd> anywhere (outside inputs). Count: <strong id="shortcut-count" data-testid="shortcut-count">0</strong></p>
+        </div>
+      </div>
+      <h3>Tab order</h3>
+      <div class="row">
+        <input type="text" placeholder="Field 1" id="tab-field-1" style="max-width:140px">
+        <input type="text" placeholder="Field 3 (tabindex=3)" tabindex="3" id="tab-field-3" style="max-width:180px">
+        <input type="text" placeholder="Field 2 (tabindex=2)" tabindex="2" id="tab-field-2" style="max-width:180px">
+        <input type="text" placeholder="Not tabbable" tabindex="-1" id="tab-field-skip" style="max-width:140px">
+      </div>
+      <p class="small">Focused element: <strong id="focused-element">—</strong></p>
+    </section>
+
+    <!-- ============ SCROLLING ============ -->
+    <section class="section card" id="scrolling">
+      <h2>Scrolling</h2>
+      <div class="grid grid-2">
+        <div>
+          <h3>Scrollable container</h3>
+          <div class="scroll-box" id="scroll-box" data-testid="scroll-box">
+            <p>Scroll down inside this box…</p>
+            <div style="height:500px"></div>
+            <button class="btn btn-primary" id="hidden-in-scroll">I was hidden below the fold</button>
+            <div style="height:100px"></div>
+          </div>
+          <p class="small">scrollTop: <span id="scroll-pos">0</span></p>
+        </div>
+        <div>
+          <h3>Horizontal scroll</h3>
+          <div class="h-scroll" id="h-scroll">
+            <span class="chip">Item 1</span><span class="chip">Item 2</span><span class="chip">Item 3</span><span class="chip">Item 4</span><span class="chip">Item 5</span>
+            <span class="chip">Item 6</span><span class="chip">Item 7</span><span class="chip">Item 8</span><span class="chip" id="last-chip">Last item</span>
+          </div>
+        </div>
+      </div>
+      <p class="small">Scroll result: <strong id="scroll-result">—</strong></p>
+    </section>
+
+    <!-- ============ SLIDER ============ -->
+    <section class="section card" id="slider">
+      <h2>Custom slider</h2>
+      <p class="section-desc">Not a native range input. Drag the handle or use arrow keys when focused.</p>
+      <div id="custom-slider" style="position:relative;height:8px;background:var(--surface-2);border-radius:999px;margin:24px 12px;cursor:pointer">
+        <div id="slider-fill" style="position:absolute;height:100%;background:var(--primary);border-radius:999px;width:30%"></div>
+        <div id="slider-handle" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="30" aria-label="Volume"
+             style="position:absolute;top:50%;left:30%;width:22px;height:22px;background:#fff;border:3px solid var(--primary);border-radius:50%;transform:translate(-50%,-50%);cursor:grab"></div>
+      </div>
+      <p>Volume: <strong id="slider-value" data-testid="slider-value">30</strong></p>
+    </section>
+
+    <!-- Modals -->
+    <div class="modal-backdrop" id="small-modal" role="dialog" aria-modal="true" aria-labelledby="small-modal-title">
+      <div class="modal">
+        <div class="modal-header"><h3 id="small-modal-title">Small modal</h3><button class="modal-close" data-close="closed with ×" aria-label="Close">×</button></div>
+        <div class="modal-body"><p>This is a small modal. Close it with the ×, the buttons, Escape or by clicking the backdrop.</p></div>
+        <div class="modal-footer">
+          <button class="btn" data-close="cancelled" id="small-modal-cancel">Cancel</button>
+          <button class="btn btn-primary" data-close="confirmed" id="small-modal-ok" data-testid="small-modal-ok">OK</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop" id="large-modal" role="dialog" aria-modal="true" aria-labelledby="large-modal-title">
+      <div class="modal modal-lg">
+        <div class="modal-header"><h3 id="large-modal-title">Terms of service</h3><button class="modal-close" data-close="closed with ×" aria-label="Close">×</button></div>
+        <div class="modal-body" id="large-modal-body"></div>
+        <div class="modal-footer">
+          <label class="check mb-0" style="margin-right:auto"><input type="checkbox" id="terms-read" disabled> I have read the terms (scroll to the bottom)</label>
+          <button class="btn btn-primary" data-close="accepted terms" id="accept-terms-btn" disabled>Accept</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-backdrop" id="delayed-modal" role="dialog" aria-modal="true" aria-labelledby="delayed-modal-title">
+      <div class="modal">
+        <div class="modal-header"><h3 id="delayed-modal-title">Loading data…</h3><button class="modal-close" data-close="closed with ×" aria-label="Close">×</button></div>
+        <div class="modal-body" id="delayed-modal-body"></div>
+        <div class="modal-footer"><button class="btn btn-primary" data-close="closed delayed modal" id="delayed-modal-close">Close</button></div>
+      </div>
+    </div>
+    <dialog id="native-dialog" aria-labelledby="native-dialog-title">
+      <form method="dialog">
+        <div class="modal-header"><h3 id="native-dialog-title">Native dialog</h3></div>
+        <div class="modal-body">
+          <label for="dialog-input" class="form-label">Your name</label>
+          <input type="text" id="dialog-input" name="name" data-testid="dialog-input">
+        </div>
+        <div class="modal-footer">
+          <button class="btn" value="cancel" id="dialog-cancel">Cancel</button>
+          <button class="btn btn-primary" value="save" id="dialog-save" data-testid="dialog-save">Save</button>
+        </div>
+      </form>
+    </dialog>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, $$ } = QA;
+
+      // Alerts
+      const result = $('#alert-result');
+      $('#alert-btn').addEventListener('click', () => { alert('I am a JS Alert'); result.textContent = 'You successfully clicked an alert'; });
+      $('#confirm-btn').addEventListener('click', () => { result.textContent = confirm('I am a JS Confirm') ? 'You clicked: Ok' : 'You clicked: Cancel'; });
+      $('#prompt-btn').addEventListener('click', () => {
+        const v = prompt('I am a JS prompt', '');
+        result.textContent = v === null ? 'You entered: null (cancelled)' : 'You entered: ' + v;
+      });
+      $('#delayed-alert-btn').addEventListener('click', () => {
+        result.textContent = 'Waiting for alert…';
+        setTimeout(() => { alert('This alert appeared after 5 seconds'); result.textContent = 'Delayed alert accepted'; }, 5000);
+      });
+
+      // Modals
+      const modalResult = $('#modal-result');
+      function openModal(id) { $('#' + id).classList.add('open'); }
+      function closeModal(el, reason) { el.classList.remove('open'); modalResult.textContent = reason; }
+      $$('.modal-backdrop').forEach((m) => {
+        m.addEventListener('click', (e) => {
+          if (e.target === m) return closeModal(m, 'closed by clicking backdrop');
+          const btn = e.target.closest('[data-close]');
+          if (btn && !btn.disabled) closeModal(m, btn.dataset.close);
+        });
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        const open = document.querySelector('.modal-backdrop.open');
+        if (open) closeModal(open, 'closed with Escape');
+      });
+      $('#open-small-modal').addEventListener('click', () => openModal('small-modal'));
+      $('#large-modal-body').innerHTML = Array.from({ length: 20 }, (_, i) =>
+        `<p><strong>Section ${i + 1}.</strong> Automated tests must be deterministic, independent and fast. Flaky tests erode trust in the suite and should be fixed or quarantined promptly.</p>`).join('') +
+        '<p id="terms-end"><strong>End of terms.</strong></p>';
+      $('#large-modal-body').style.maxHeight = '50vh';
+      $('#large-modal-body').style.overflowY = 'auto';
+      $('#large-modal-body').addEventListener('scroll', function () {
+        if (this.scrollTop + this.clientHeight >= this.scrollHeight - 5) {
+          $('#terms-read').disabled = false;
+        }
+      });
+      $('#terms-read').addEventListener('change', (e) => { $('#accept-terms-btn').disabled = !e.target.checked; });
+      $('#open-large-modal').addEventListener('click', () => openModal('large-modal'));
+      $('#open-delayed-modal').addEventListener('click', () => {
+        $('#delayed-modal-title').textContent = 'Loading data…';
+        $('#delayed-modal-body').innerHTML = '<span class="spinner"></span>';
+        openModal('delayed-modal');
+        setTimeout(() => {
+          $('#delayed-modal-title').textContent = 'Data loaded';
+          $('#delayed-modal-body').innerHTML = '<p id="delayed-modal-content" data-testid="delayed-modal-content">The content arrived after 2 seconds.</p>';
+        }, 2000);
+      });
+      const dialog = $('#native-dialog');
+      $('#open-native-dialog').addEventListener('click', () => { $('#dialog-input').value = ''; dialog.showModal(); });
+      dialog.addEventListener('close', () => {
+        modalResult.textContent = dialog.returnValue === 'save' ? 'dialog saved: ' + $('#dialog-input').value : 'dialog cancelled';
+      });
+      $('#close-inline-alert').addEventListener('click', () => $('#dismissible-alert').remove());
+
+      // Tabs with keyboard support
+      const tabs = $$('#demo-tabs [role="tab"]:not(:disabled)');
+      function activate(tab) {
+        tabs.forEach((t) => {
+          const on = t === tab;
+          t.setAttribute('aria-selected', on);
+          t.tabIndex = on ? 0 : -1;
+          $('#' + t.getAttribute('aria-controls')).hidden = !on;
+        });
+        tab.focus();
+      }
+      tabs.forEach((t, i) => {
+        t.addEventListener('click', () => activate(t));
+        t.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight') activate(tabs[(i + 1) % tabs.length]);
+          if (e.key === 'ArrowLeft') activate(tabs[(i - 1 + tabs.length) % tabs.length]);
+        });
+      });
+      // Accordion
+      $$('#accordion .accordion-header').forEach((h) => h.addEventListener('click', () => {
+        const open = h.getAttribute('aria-expanded') !== 'true';
+        h.setAttribute('aria-expanded', open);
+        $('#' + h.getAttribute('aria-controls')).hidden = !open;
+      }));
+
+      // Hover
+      $('#hover-menu').addEventListener('click', (e) => {
+        const a = e.target.closest('a');
+        if (a) { e.preventDefault(); $('#menu-result').textContent = a.textContent.replace('›', '').trim(); }
+      });
+      const hoverBox = $('#hover-box');
+      hoverBox.addEventListener('mouseenter', () => { $('#hover-status').textContent = 'hovered'; hoverBox.style.background = 'var(--info-bg)'; });
+      hoverBox.addEventListener('mouseleave', () => { $('#hover-status').textContent = 'not hovered'; hoverBox.style.background = ''; });
+
+      // HTML5 drag & drop
+      const drop = $('#droppable');
+      $('#draggable').addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', 'draggable'); });
+      drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
+      drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+      drop.addEventListener('drop', (e) => {
+        e.preventDefault();
+        drop.classList.remove('over');
+        if (e.dataTransfer.getData('text/plain') === 'draggable') {
+          drop.classList.add('dropped');
+          drop.textContent = 'Dropped!';
+        }
+      });
+
+      // Sortable list
+      const sortable = $('#sortable-list');
+      let dragged = null;
+      const updateOrder = () => { $('#sort-order').textContent = $$('li', sortable).map((li) => li.dataset.item).join(', '); };
+      sortable.addEventListener('dragstart', (e) => { dragged = e.target; e.target.classList.add('dragging'); e.dataTransfer.setData('text/plain', 'sort'); });
+      sortable.addEventListener('dragend', (e) => { e.target.classList.remove('dragging'); updateOrder(); });
+      sortable.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const over = e.target.closest('li');
+        if (!over || over === dragged || !dragged || dragged.parentElement !== sortable) return;
+        const rect = over.getBoundingClientRect();
+        sortable.insertBefore(dragged, e.clientY > rect.top + rect.height / 2 ? over.nextSibling : over);
+      });
+      sortable.addEventListener('drop', (e) => { e.preventDefault(); updateOrder(); });
+      updateOrder();
+
+      // Move between lists
+      let card = null;
+      const counts = () => { $('#todo-count').textContent = $('#todo-list').children.length; $('#done-count').textContent = $('#done-list').children.length; };
+      $$('.drop-list').forEach((list) => {
+        list.addEventListener('dragstart', (e) => { card = e.target; e.dataTransfer.setData('text/plain', e.target.id); });
+        list.addEventListener('dragover', (e) => e.preventDefault());
+        list.addEventListener('drop', (e) => {
+          e.preventDefault();
+          const el = document.getElementById(e.dataTransfer.getData('text/plain')) || card;
+          if (el && el.parentElement && el.parentElement.classList.contains('drop-list')) list.appendChild(el);
+          counts();
+        });
+      });
+
+      // Free drag with mouse events
+      const area = $('#drag-area');
+      const box = $('#free-box');
+      let dragging = false, offX = 0, offY = 0;
+      box.addEventListener('mousedown', (e) => { dragging = true; offX = e.clientX - box.offsetLeft; offY = e.clientY - box.offsetTop; e.preventDefault(); });
+      document.addEventListener('mousemove', (e) => {
+        if (!dragging) return;
+        const x = Math.max(0, Math.min(area.clientWidth - box.offsetWidth, e.clientX - offX));
+        const y = Math.max(0, Math.min(area.clientHeight - box.offsetHeight, e.clientY - offY));
+        box.style.left = x + 'px'; box.style.top = y + 'px';
+        $('#box-position').textContent = `x: ${Math.round(x)}, y: ${Math.round(y)}`;
+      });
+      document.addEventListener('mouseup', () => { dragging = false; });
+
+      // Context menu
+      const menu = $('#context-menu');
+      $('#context-area').addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        menu.style.left = e.clientX + 'px';
+        menu.style.top = e.clientY + 'px';
+        menu.classList.remove('hidden');
+      });
+      menu.addEventListener('click', (e) => {
+        const li = e.target.closest('li');
+        if (li) { $('#context-result').textContent = li.dataset.action; menu.classList.add('hidden'); }
+      });
+      document.addEventListener('click', (e) => { if (!menu.contains(e.target)) menu.classList.add('hidden'); });
+
+      // Click and hold
+      const hold = $('#hold-btn');
+      let holdTimer = null, holdStart = 0;
+      function startHold() {
+        holdStart = Date.now();
+        $('#hold-result').textContent = 'holding…';
+        holdTimer = setInterval(() => {
+          const pct = Math.min(100, ((Date.now() - holdStart) / 2000) * 100);
+          $('#hold-progress').style.width = pct + '%';
+          if (pct >= 100) { clearInterval(holdTimer); holdTimer = null; $('#hold-result').textContent = 'Success! Held for 2 seconds'; }
+        }, 50);
+      }
+      function endHold() {
+        if (holdTimer) { clearInterval(holdTimer); holdTimer = null; $('#hold-result').textContent = 'Released too early'; $('#hold-progress').style.width = '0'; }
+      }
+      hold.addEventListener('mousedown', startHold);
+      hold.addEventListener('mouseup', endHold);
+      hold.addEventListener('mouseleave', endHold);
+      $('#mouse-tracker').addEventListener('mousemove', (e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        $('#mouse-coords').textContent = `x: ${Math.round(e.clientX - r.left)}, y: ${Math.round(e.clientY - r.top)}`;
+      });
+
+      // Keyboard
+      $('#key-input').addEventListener('keydown', (e) => {
+        $('#key-result').textContent = e.key === ' ' ? 'SPACE' : e.key.length === 1 ? e.key.toUpperCase() : e.key.toUpperCase();
+        const mods = ['ctrlKey', 'shiftKey', 'altKey', 'metaKey'].filter((m) => e[m]).map((m) => m.replace('Key', ''));
+        $('#key-modifiers').textContent = mods.join(' + ') || 'none';
+      });
+      let shortcuts = 0;
+      document.addEventListener('keydown', (e) => {
+        if (e.shiftKey && e.key.toLowerCase() === 'k' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) {
+          shortcuts++;
+          $('#shortcut-count').textContent = shortcuts;
+          QA.toast('Shift + K pressed');
+        }
+      });
+      document.addEventListener('focusin', (e) => {
+        const el = e.target;
+        $('#focused-element').textContent = el.id ? '#' + el.id : el.tagName.toLowerCase() + (el.placeholder ? ` [placeholder="${el.placeholder}"]` : '');
+      });
+
+      // Scrolling
+      $('#scroll-box').addEventListener('scroll', function () { $('#scroll-pos').textContent = Math.round(this.scrollTop); });
+      $('#hidden-in-scroll').addEventListener('click', () => { $('#scroll-result').textContent = 'Clicked the button inside the scroll box'; });
+      $('#h-scroll').addEventListener('scroll', function () {
+        if (this.scrollLeft + this.clientWidth >= this.scrollWidth - 5) $('#scroll-result').textContent = 'Reached the end of the horizontal list';
+      });
+
+      // Custom slider
+      const track = $('#custom-slider');
+      const handle = $('#slider-handle');
+      function setSlider(v) {
+        v = Math.round(Math.max(0, Math.min(100, v)));
+        handle.style.left = v + '%';
+        $('#slider-fill').style.width = v + '%';
+        handle.setAttribute('aria-valuenow', v);
+        $('#slider-value').textContent = v;
+      }
+      let sliding = false;
+      const fromEvent = (e) => { const r = track.getBoundingClientRect(); setSlider(((e.clientX - r.left) / r.width) * 100); };
+      track.addEventListener('mousedown', (e) => { sliding = true; fromEvent(e); e.preventDefault(); });
+      document.addEventListener('mousemove', (e) => { if (sliding) fromEvent(e); });
+      document.addEventListener('mouseup', () => { sliding = false; });
+      handle.addEventListener('keydown', (e) => {
+        const v = Number(handle.getAttribute('aria-valuenow'));
+        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') { e.preventDefault(); setSlider(v + 1); }
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') { e.preventDefault(); setSlider(v - 1); }
+        if (e.key === 'Home') setSlider(0);
+        if (e.key === 'End') setSlider(100);
+      });
+    })();
+  </script>
+</body>
+</html>

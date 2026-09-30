@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Frame: Child</title>
+  <link rel="stylesheet" href="../assets/css/styles.css">
+</head>
+<body style="background:#e7f5ff;padding:12px">
+  <h4 id="child-heading" style="margin:0 0 8px">Child frame (nested)</h4>
+  <div class="row">
+    <input type="text" id="child-input" placeholder="Type inside the nested frame" style="max-width:260px" data-testid="child-input">
+    <button class="btn btn-primary" id="child-button" data-testid="child-button">Click me</button>
+  </div>
+  <p id="child-result" data-testid="child-result"></p>
+  <script>
+    document.getElementById('child-button').addEventListener('click', function () {
+      const v = document.getElementById('child-input').value;
+      document.getElementById('child-result').textContent = v ? 'Child frame says: ' + v : 'Child button clicked';
+    });
+  </script>
+</body>
+</html>

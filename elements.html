@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elements &amp; Forms | QA Automation Playground</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" id="main-content">
+    <div class="page-header">
+      <h1>Elements &amp; Forms</h1>
+      <p>Every element here can be located in several ways: <code>id</code>, <code>name</code>, <code>class</code>, <code>data-testid</code>, ARIA role/label, visible text or XPath. Some are intentionally harder.</p>
+    </div>
+    <nav class="toc" aria-label="On this page">
+      <a href="#text-inputs">Text inputs</a><a href="#buttons">Buttons</a><a href="#checkboxes">Checkboxes</a><a href="#radios">Radio buttons</a>
+      <a href="#selects">Dropdowns</a><a href="#special-inputs">Special inputs</a><a href="#file-upload">File upload</a><a href="#links">Links</a>
+      <a href="#lists">Lists</a><a href="#locator-challenges">Locator challenges</a><a href="#images">Images</a><a href="#practice-form">Practice form</a>
+    </nav>
+
+    <!-- ============ TEXT INPUTS ============ -->
+    <section class="section card" id="text-inputs">
+      <h2>Text inputs</h2>
+      <p class="section-desc">Type, clear, read values and attributes. Output updates on every keystroke.</p>
+      <div class="form-row">
+        <div class="form-group"><label for="text-input">Text input</label><input type="text" id="text-input" name="textInput" class="form-control input-text" placeholder="Enter some text" data-testid="text-input"></div>
+        <div class="form-group"><label for="email-input">Email input</label><input type="email" id="email-input" name="emailInput" class="form-control" placeholder="name@example.com" data-testid="email-input"></div>
+        <div class="form-group"><label for="password-input">Password input</label><input type="password" id="password-input" name="passwordInput" class="form-control" placeholder="Secret" data-testid="password-input"></div>
+        <div class="form-group"><label for="number-input">Number input (0-100)</label><input type="number" id="number-input" name="numberInput" min="0" max="100" step="5" value="10" data-testid="number-input"></div>
+        <div class="form-group"><label for="tel-input">Telephone</label><input type="tel" id="tel-input" name="telInput" placeholder="+1 555 0100" pattern="[0-9+ ]+"></div>
+        <div class="form-group"><label for="url-input">URL</label><input type="url" id="url-input" name="urlInput" placeholder="https://example.com"></div>
+        <div class="form-group"><label for="search-field">Search</label><input type="search" id="search-field" name="q" placeholder="Search…" aria-label="Search the site"></div>
+        <div class="form-group"><label for="prefilled-input">Prefilled (clear me)</label><input type="text" id="prefilled-input" name="prefilled" value="Clear this text before typing"></div>
+        <div class="form-group"><label for="readonly-input">Read-only</label><input type="text" id="readonly-input" name="readonly" value="You can read but not edit me" readonly></div>
+        <div class="form-group"><label for="disabled-input">Disabled</label><input type="text" id="disabled-input" name="disabled" value="I am disabled" disabled></div>
+        <div class="form-group"><label for="maxlength-input">Max length 10</label><input type="text" id="maxlength-input" name="maxlength" maxlength="10" placeholder="Max 10 chars"></div>
+        <div class="form-group">
+          <label for="enable-me-input">Initially disabled</label>
+          <div class="input-group"><input type="text" id="enable-me-input" disabled placeholder="Click Enable first"><button type="button" class="btn" id="enable-input-btn">Enable</button></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="textarea-input">Textarea</label>
+        <textarea id="textarea-input" name="comments" rows="3" placeholder="Write multiple lines…" data-testid="textarea"></textarea>
+      </div>
+      <div class="form-group">
+        <!-- No label: must be located by placeholder, name or XPath -->
+        <input type="text" name="unlabelled" placeholder="Input without a label">
+      </div>
+      <div class="output" id="text-output" data-testid="text-output" aria-live="polite">Start typing…</div>
+    </section>
+
+    <!-- ============ BUTTONS ============ -->
+    <section class="section card" id="buttons">
+      <h2>Buttons</h2>
+      <p class="section-desc">Different click types and button flavours. The result of the last action is shown below.</p>
+      <div class="row" style="margin-bottom:12px">
+        <button type="button" class="btn btn-primary" id="click-btn" data-testid="click-btn">Click me</button>
+        <button type="button" class="btn" id="double-click-btn" data-testid="double-click-btn">Double click me</button>
+        <button type="button" class="btn" id="right-click-btn" data-testid="right-click-btn">Right click me</button>
+        <button type="button" class="btn" id="disabled-btn" disabled>Disabled button</button>
+        <button type="button" class="btn btn-success" id="toggle-btn" aria-pressed="false">Toggle: OFF</button>
+        <button type="button" class="btn" id="counter-btn">Clicked <span id="click-count">0</span> times</button>
+      </div>
+      <div class="row" style="margin-bottom:12px">
+        <button type="button" class="btn" aria-label="Settings" title="Settings" id="icon-btn">⚙️</button>
+        <button type="button" class="btn" aria-label="Delete item">🗑️</button>
+        <input type="button" class="btn" value="Input type=button" id="input-button">
+        <input type="submit" class="btn" value="Input type=submit" form="none">
+        <a href="#buttons" class="btn btn-primary" role="button" id="link-button">Link styled as button</a>
+        <div class="btn" role="button" tabindex="0" id="div-button">Div with role=button</div>
+        <span class="btn" onclick="document.getElementById('button-output').textContent='Span button clicked'" style="cursor:pointer">Span with onclick</span>
+      </div>
+      <div class="row" style="margin-bottom:12px">
+        <!-- Three buttons with identical text: locate by position or container -->
+        <div class="card" style="padding:10px" data-section="alpha"><strong>Alpha</strong> <button class="btn btn-sm same-text-btn">Submit</button></div>
+        <div class="card" style="padding:10px" data-section="beta"><strong>Beta</strong> <button class="btn btn-sm same-text-btn">Submit</button></div>
+        <div class="card" style="padding:10px" data-section="gamma"><strong>Gamma</strong> <button class="btn btn-sm same-text-btn">Submit</button></div>
+      </div>
+      <div class="output" id="button-output" data-testid="button-output">No button clicked yet</div>
+    </section>
+
+    <!-- ============ CHECKBOXES ============ -->
+    <section class="section card" id="checkboxes">
+      <h2>Checkboxes</h2>
+      <p class="section-desc">"Select all" controls the group. One option is disabled, one is pre-checked.</p>
+      <label class="check" style="font-weight:700"><input type="checkbox" id="select-all" data-testid="select-all"> Select all fruits</label>
+      <div id="fruit-group" style="padding-left:24px" role="group" aria-label="Fruits">
+        <label class="check"><input type="checkbox" name="fruit" value="apple" id="fruit-apple"> Apple</label>
+        <label class="check"><input type="checkbox" name="fruit" value="banana" id="fruit-banana" checked> Banana</label>
+        <label class="check"><input type="checkbox" name="fruit" value="cherry" id="fruit-cherry"> Cherry</label>
+        <label class="check"><input type="checkbox" name="fruit" value="mango" id="fruit-mango"> Mango</label>
+        <label class="check"><input type="checkbox" name="fruit" value="durian" id="fruit-durian" disabled> Durian (disabled)</label>
+      </div>
+      <h3 style="margin-top:16px">Checkboxes without IDs</h3>
+      <div class="row" id="no-id-checkboxes">
+        <label class="check"><input type="checkbox" name="option"> Option 1</label>
+        <label class="check"><input type="checkbox" name="option"> Option 2</label>
+        <label class="check"><input type="checkbox" name="option"> Option 3</label>
+        <input type="checkbox" name="lonely" aria-label="Checkbox with aria-label only">
+      </div>
+      <h3 style="margin-top:16px">Toggle switches</h3>
+      <div class="row">
+        <label class="switch"><input type="checkbox" role="switch" id="switch-wifi" checked><span class="slider"></span> Wi-Fi</label>
+        <label class="switch"><input type="checkbox" role="switch" id="switch-bluetooth"><span class="slider"></span> Bluetooth</label>
+        <label class="switch"><input type="checkbox" role="switch" id="switch-airplane"><span class="slider"></span> Airplane mode</label>
+      </div>
+      <div class="output" id="checkbox-output" data-testid="checkbox-output" style="margin-top:12px"></div>
+    </section>
+
+    <!-- ============ RADIOS ============ -->
+    <section class="section card" id="radios">
+      <h2>Radio buttons</h2>
+      <div class="grid grid-2">
+        <fieldset>
+          <legend>Favourite browser</legend>
+          <label class="check"><input type="radio" name="browser" value="chrome" id="radio-chrome"> Chrome</label>
+          <label class="check"><input type="radio" name="browser" value="firefox" id="radio-firefox"> Firefox</label>
+          <label class="check"><input type="radio" name="browser" value="safari" id="radio-safari"> Safari</label>
+          <label class="check"><input type="radio" name="browser" value="edge" id="radio-edge"> Edge</label>
+          <label class="check"><input type="radio" name="browser" value="ie" id="radio-ie" disabled> Internet Explorer (disabled)</label>
+        </fieldset>
+        <fieldset>
+          <legend>Experience level</legend>
+          <label class="check"><input type="radio" name="level" value="junior"> Junior</label>
+          <label class="check"><input type="radio" name="level" value="mid" checked> Mid</label>
+          <label class="check"><input type="radio" name="level" value="senior"> Senior</label>
+        </fieldset>
+      </div>
+      <div class="output" id="radio-output" data-testid="radio-output"></div>
+    </section>
+
+    <!-- ============ SELECTS ============ -->
+    <section class="section card" id="selects">
+      <h2>Dropdowns</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="single-select">Native single select</label>
+          <select id="single-select" name="car" data-testid="single-select">
+            <option value="">-- Choose a car --</option>
+            <option value="volvo">Volvo</option>
+            <option value="saab">Saab</option>
+            <option value="mercedes">Mercedes</option>
+            <option value="audi" selected>Audi</option>
+            <option value="tesla" disabled>Tesla (disabled)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="grouped-select">Select with optgroups</label>
+          <select id="grouped-select" name="city">
+            <optgroup label="Europe">
+              <option value="bucharest">Bucharest</option>
+              <option value="berlin">Berlin</option>
+              <option value="paris">Paris</option>
+            </optgroup>
+            <optgroup label="America">
+              <option value="nyc">New York</option>
+              <option value="toronto">Toronto</option>
+            </optgroup>
+            <optgroup label="Asia">
+              <option value="tokyo">Tokyo</option>
+              <option value="mumbai">Mumbai</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="multi-select">Multi select (Ctrl/Cmd + click)</label>
+          <select id="multi-select" name="languages" multiple data-testid="multi-select">
+            <option value="java">Java</option>
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="csharp">C#</option>
+            <option value="ruby">Ruby</option>
+            <option value="go">Go</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <span class="form-label" id="custom-select-label">Custom (non-native) dropdown</span>
+          <div class="custom-select" id="custom-select" data-testid="custom-select">
+            <button type="button" class="custom-select-trigger" id="custom-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="custom-select-label custom-select-trigger">
+              <span id="custom-select-value">Select a colour</span><span aria-hidden="true">▾</span>
+            </button>
+            <ul class="custom-select-options hidden" role="listbox" id="custom-select-options" aria-labelledby="custom-select-label">
+              <li role="option" data-value="red" aria-selected="false">🔴 Red</li>
+              <li role="option" data-value="green" aria-selected="false">🟢 Green</li>
+              <li role="option" data-value="blue" aria-selected="false">🔵 Blue</li>
+              <li role="option" data-value="yellow" aria-selected="false">🟡 Yellow</li>
+              <li role="option" data-value="purple" aria-selected="false">🟣 Purple</li>
+            </ul>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="autocomplete-input">Autocomplete (type a country)</label>
+          <div class="autocomplete">
+            <input type="text" id="autocomplete-input" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="autocomplete-list" aria-autocomplete="list" placeholder="e.g. Ro…" data-testid="autocomplete-input">
+            <ul class="autocomplete-list hidden" id="autocomplete-list" role="listbox"></ul>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="datalist-input">Datalist</label>
+          <input list="framework-list" id="datalist-input" name="framework" placeholder="Pick a framework">
+          <datalist id="framework-list">
+            <option value="Selenium"><option value="Playwright"><option value="Cypress"><option value="WebdriverIO"><option value="Puppeteer"><option value="TestCafe">
+          </datalist>
+        </div>
+      </div>
+      <div class="output" id="select-output" data-testid="select-output"></div>
+    </section>
+
+    <!-- ============ SPECIAL INPUTS ============ -->
+    <section class="section card" id="special-inputs">
+      <h2>Special inputs</h2>
+      <div class="form-row">
+        <div class="form-group"><label for="date-input">Date</label><input type="date" id="date-input" name="date" min="2020-01-01" max="2030-12-31"></div>
+        <div class="form-group"><label for="time-input">Time</label><input type="time" id="time-input" name="time"></div>
+        <div class="form-group"><label for="datetime-input">Date &amp; time</label><input type="datetime-local" id="datetime-input" name="datetime"></div>
+        <div class="form-group"><label for="month-input">Month</label><input type="month" id="month-input" name="month"></div>
+        <div class="form-group"><label for="week-input">Week</label><input type="week" id="week-input" name="week"></div>
+        <div class="form-group"><label for="color-input">Colour picker</label><input type="color" id="color-input" name="color" value="#3b5bdb" style="width:100%;height:40px"></div>
+      </div>
+      <div class="form-group">
+        <label for="range-input">Range slider: <output id="range-value" for="range-input" data-testid="range-value">50</output></label>
+        <input type="range" id="range-input" name="range" min="0" max="100" value="50" step="1" style="width:100%" data-testid="range-input">
+      </div>
+      <div class="form-group">
+        <label for="native-progress">Native progress &amp; meter</label>
+        <progress id="native-progress" value="70" max="100" style="width:100%">70%</progress>
+        <meter id="native-meter" value="0.6" min="0" max="1" low="0.3" high="0.8" optimum="0.5" style="width:100%">60%</meter>
+      </div>
+      <div class="output" id="special-output" data-testid="special-output"></div>
+    </section>
+
+    <!-- ============ FILE UPLOAD ============ -->
+    <section class="section card" id="file-upload">
+      <h2>File upload</h2>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="single-file">Single file</label>
+          <input type="file" id="single-file" name="file" data-testid="single-file">
+        </div>
+        <div class="form-group">
+          <label for="multi-file">Multiple images only</label>
+          <input type="file" id="multi-file" name="files" multiple accept="image/*" data-testid="multi-file">
+        </div>
+        <div class="form-group">
+          <span class="form-label">Hidden input behind a styled button</span>
+          <label class="btn" for="hidden-file" id="hidden-file-label">📎 Choose file…</label>
+          <input type="file" id="hidden-file" class="hidden" data-testid="hidden-file">
+        </div>
+      </div>
+      <div class="output" id="upload-output" data-testid="upload-output">No file selected</div>
+    </section>
+
+    <!-- ============ LINKS ============ -->
+    <section class="section card" id="links">
+      <h2>Links</h2>
+      <ul>
+        <li><a href="index.html" id="home-link">Home (same tab)</a></li>
+        <li><a href="index.html" target="_blank" rel="noopener" id="new-tab-link">Home (new tab)</a></li>
+        <li><a href="does-not-exist.html" id="broken-link" data-testid="broken-link">Broken link (404)</a></li>
+        <li><a href="#links" id="anchor-link">Anchor link to this section</a></li>
+        <li><a href="#" id="js-link" data-testid="js-link">JavaScript link (shows message)</a> <span id="js-link-output" class="muted"></span></li>
+        <li><a href="https://example.com" id="external-link" target="_blank" rel="noopener">External link to example.com</a></li>
+        <li><a href="mailto:qa@example.com" id="mailto-link">mailto: link</a></li>
+        <li><a href="tel:+15550100" id="tel-link">tel: link</a></li>
+        <li><a href="assets/css/styles.css" download id="download-link">Download a file</a></li>
+        <li>Partial text: <a href="shop.html" id="partial-link">Browse the full product catalogue here</a></li>
+        <li>Link text with <a href="login.html"><span>nested</span> <strong>markup</strong></a></li>
+      </ul>
+    </section>
+
+    <!-- ============ LISTS ============ -->
+    <section class="section card" id="lists">
+      <h2>Lists &amp; text</h2>
+      <div class="grid grid-3">
+        <div>
+          <h3>Ordered list</h3>
+          <ol id="ordered-list">
+            <li>Write the test</li>
+            <li>Run the test</li>
+            <li>Watch it fail</li>
+            <li>Fix the code</li>
+            <li>Watch it pass</li>
+          </ol>
+        </div>
+        <div>
+          <h3>Nested list</h3>
+          <ul id="nested-list" class="nested">
+            <li>Frontend
+              <ul><li>HTML</li><li>CSS</li><li>JavaScript
+                <ul><li>React</li><li>Vue</li></ul></li></ul>
+            </li>
+            <li>Testing
+              <ul><li>Unit</li><li>Integration</li><li>End-to-end</li></ul>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3>Description list</h3>
+          <dl class="details" id="description-list">
+            <dt>Name</dt><dd>Jane Doe</dd>
+            <dt>Role</dt><dd>QA Engineer</dd>
+            <dt>Team</dt><dd>Checkout</dd>
+            <dt>Location</dt><dd>Remote</dd>
+          </dl>
+        </div>
+      </div>
+      <h3 style="margin-top:16px">Text</h3>
+      <p id="paragraph-1">This is a paragraph with <strong>bold text</strong>, <em>italic text</em>, <span class="highlight" style="background:#fff3bf">highlighted span</span> and <code>inline code</code>.</p>
+      <p id="whitespace-text">   This   text   has   extra   whitespace.   </p>
+      <p class="multi class names here" data-role="paragraph">Paragraph with multiple classes: <code>multi class names here</code></p>
+      <p hidden id="hidden-paragraph">This paragraph is hidden with the hidden attribute.</p>
+      <p style="display:none" id="display-none-paragraph">This paragraph has display:none.</p>
+      <p class="invisible" id="invisible-paragraph">This paragraph has visibility:hidden.</p>
+      <p id="special-chars">Special characters: "quotes", 'apostrophes', &amp; ampersands, &lt;brackets&gt;, emoji 🎉 and non-breaking&nbsp;space.</p>
+      <blockquote id="quote" cite="https://example.com">"Testing shows the presence, not the absence of bugs." — Edsger W. Dijkstra</blockquote>
+    </section>
+
+    <!-- ============ LOCATOR CHALLENGES ============ -->
+    <section class="section card" id="locator-challenges">
+      <h2>Locator challenges</h2>
+      <p class="section-desc">These elements have no IDs. Use relative locators, XPath axes (<code>following-sibling</code>, <code>ancestor</code>), <code>:has()</code>, or text matching.</p>
+      <div class="grid grid-3" id="user-cards">
+        <div class="card user-card">
+          <h3>Alice Johnson</h3>
+          <p class="muted">Senior QA</p>
+          <span class="badge badge-success">Active</span>
+          <div class="row" style="margin-top:10px"><button class="btn btn-sm">View</button><button class="btn btn-sm">Edit</button><button class="btn btn-sm btn-outline-danger">Delete</button></div>
+        </div>
+        <div class="card user-card">
+          <h3>Bob Smith</h3>
+          <p class="muted">SDET</p>
+          <span class="badge badge-danger">Inactive</span>
+          <div class="row" style="margin-top:10px"><button class="btn btn-sm">View</button><button class="btn btn-sm">Edit</button><button class="btn btn-sm btn-outline-danger">Delete</button></div>
+        </div>
+        <div class="card user-card">
+          <h3>Carol White</h3>
+          <p class="muted">QA Lead</p>
+          <span class="badge badge-success">Active</span>
+          <div class="row" style="margin-top:10px"><button class="btn btn-sm">View</button><button class="btn btn-sm">Edit</button><button class="btn btn-sm btn-outline-danger">Delete</button></div>
+        </div>
+      </div>
+      <div class="output" id="challenge-output" style="margin-top:12px">Click a button on one of the cards</div>
+
+      <h3 style="margin-top:20px">Label / value pairs</h3>
+      <div id="key-values">
+        <div class="kv"><span>Order ID:</span> <span>ORD-99812</span></div>
+        <div class="kv"><span>Status:</span> <span>Shipped</span></div>
+        <div class="kv"><span>Carrier:</span> <span>FastShip</span></div>
+        <div class="kv"><span>Tracking:</span> <span>FS-1029-3847-XK</span></div>
+      </div>
+
+      <h3 style="margin-top:20px">Deeply nested element</h3>
+      <div class="level-1"><div class="level-2"><div class="level-3"><div class="level-4"><div class="level-5"><span class="deep-target">You found me at level 5!</span></div></div></div></div></div>
+
+      <h3 style="margin-top:20px">Similar attributes</h3>
+      <div class="row">
+        <input type="text" name="user_name" placeholder="user_name">
+        <input type="text" name="user-name" placeholder="user-name">
+        <input type="text" name="userName" placeholder="userName">
+        <input type="text" name="username_confirm" placeholder="username_confirm">
+      </div>
+      <p class="small muted" style="margin-top:8px">Practise attribute selectors: <code>[name^="user"]</code>, <code>[name$="name"]</code>, <code>[name*="_"]</code>.</p>
+    </section>
+
+    <!-- ============ IMAGES ============ -->
+    <section class="section card" id="images">
+      <h2>Images</h2>
+      <div class="row" style="align-items:flex-end">
+        <figure style="margin:0">
+          <img id="valid-image" alt="Blue square" width="100" height="100"
+               src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%233b5bdb'/%3E%3C/svg%3E">
+          <figcaption class="small">Valid image</figcaption>
+        </figure>
+        <figure style="margin:0">
+          <img id="broken-image-1" src="images/missing-image.png" alt="Broken image 1" width="100" height="100" data-testid="broken-image">
+          <figcaption class="small">Broken image</figcaption>
+        </figure>
+        <figure style="margin:0">
+          <img id="broken-image-2" src="images/another-missing.jpg" alt="Broken image 2" width="100" height="100" data-testid="broken-image">
+          <figcaption class="small">Broken image</figcaption>
+        </figure>
+        <figure style="margin:0">
+          <svg id="inline-svg" width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="Green circle">
+            <circle cx="50" cy="50" r="45" fill="#2b8a3e"></circle>
+            <text x="50" y="56" text-anchor="middle" fill="#fff" font-size="16">SVG</text>
+          </svg>
+          <figcaption class="small">Inline SVG</figcaption>
+        </figure>
+        <figure style="margin:0">
+          <canvas id="canvas" width="100" height="100" aria-label="Canvas drawing"></canvas>
+          <figcaption class="small">Canvas</figcaption>
+        </figure>
+      </div>
+      <button class="btn btn-sm" id="check-images" style="margin-top:12px">Count broken images</button>
+      <span id="broken-count" data-testid="broken-count"></span>
+    </section>
+
+    <!-- ============ PRACTICE FORM ============ -->
+    <section class="section card" id="practice-form">
+      <h2>Practice form</h2>
+      <p class="section-desc">A complete form using native HTML5 validation. Submitted values are shown as JSON.</p>
+      <form id="student-form" name="studentForm" data-testid="student-form">
+        <div class="form-row">
+          <div class="form-group"><label for="sf-name">Full name *</label><input type="text" id="sf-name" name="fullName" required minlength="3"></div>
+          <div class="form-group"><label for="sf-email">Email *</label><input type="email" id="sf-email" name="email" required></div>
+          <div class="form-group"><label for="sf-mobile">Mobile (10 digits) *</label><input type="tel" id="sf-mobile" name="mobile" required pattern="\d{10}" title="10 digits"></div>
+        </div>
+        <fieldset>
+          <legend>Gender *</legend>
+          <div class="row">
+            <label class="check"><input type="radio" name="gender" value="Male" required> Male</label>
+            <label class="check"><input type="radio" name="gender" value="Female"> Female</label>
+            <label class="check"><input type="radio" name="gender" value="Other"> Other</label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Hobbies</legend>
+          <div class="row">
+            <label class="check"><input type="checkbox" name="hobbies" value="Sports"> Sports</label>
+            <label class="check"><input type="checkbox" name="hobbies" value="Reading"> Reading</label>
+            <label class="check"><input type="checkbox" name="hobbies" value="Music"> Music</label>
+          </div>
+        </fieldset>
+        <div class="form-row">
+          <div class="form-group"><label for="sf-dob">Date of birth</label><input type="date" id="sf-dob" name="dob"></div>
+          <div class="form-group"><label for="sf-subject">Subject</label>
+            <select id="sf-subject" name="subject"><option value="">Choose…</option><option>Maths</option><option>Physics</option><option>Computer Science</option><option>English</option></select>
+          </div>
+        </div>
+        <div class="form-group"><label for="sf-address">Address</label><textarea id="sf-address" name="address"></textarea></div>
+        <div class="row">
+          <button type="submit" class="btn btn-primary" id="sf-submit" data-testid="sf-submit">Submit</button>
+          <button type="reset" class="btn" id="sf-reset">Reset</button>
+        </div>
+      </form>
+      <div class="output" id="form-output" style="margin-top:12px" data-testid="form-output">Submit the form to see the data</div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/common.js"></script>
+  <script>
+    (function () {
+      const { $, $$ } = QA;
+
+      // Text inputs
+      const textIds = ['text-input', 'email-input', 'password-input', 'number-input', 'tel-input', 'url-input', 'search-field', 'prefilled-input', 'maxlength-input', 'enable-me-input', 'textarea-input'];
+      function updateText() {
+        $('#text-output').textContent = textIds.map((id) => `${id}: ${$('#' + id).value}`).join('\n');
+      }
+      textIds.forEach((id) => $('#' + id).addEventListener('input', updateText));
+      $('#enable-input-btn').addEventListener('click', function () {
+        const input = $('#enable-me-input');
+        input.disabled = !input.disabled;
+        this.textContent = input.disabled ? 'Enable' : 'Disable';
+        input.placeholder = input.disabled ? 'Click Enable first' : 'Now you can type';
+      });
+
+      // Buttons
+      const out = $('#button-output');
+      $('#click-btn').addEventListener('click', () => (out.textContent = 'You clicked the button'));
+      $('#double-click-btn').addEventListener('dblclick', () => (out.textContent = 'You double clicked the button'));
+      $('#right-click-btn').addEventListener('contextmenu', (e) => { e.preventDefault(); out.textContent = 'You right clicked the button'; });
+      $('#toggle-btn').addEventListener('click', function () {
+        const on = this.getAttribute('aria-pressed') !== 'true';
+        this.setAttribute('aria-pressed', on);
+        this.textContent = 'Toggle: ' + (on ? 'ON' : 'OFF');
+        out.textContent = 'Toggle is ' + (on ? 'ON' : 'OFF');
+      });
+      let clicks = 0;
+      $('#counter-btn').addEventListener('click', () => { clicks++; $('#click-count').textContent = clicks; out.textContent = 'Counter: ' + clicks; });
+      $('#icon-btn').addEventListener('click', () => (out.textContent = 'Settings icon button clicked'));
+      $('#input-button').addEventListener('click', () => (out.textContent = 'Input type=button clicked'));
+      $('#link-button').addEventListener('click', () => (out.textContent = 'Link styled as button clicked'));
+      const divBtn = $('#div-button');
+      divBtn.addEventListener('click', () => (out.textContent = 'Div role=button clicked'));
+      divBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); divBtn.click(); } });
+      $$('.same-text-btn').forEach((b) => b.addEventListener('click', () => {
+        out.textContent = 'Submit clicked in section: ' + b.closest('[data-section]').dataset.section;
+      }));
+      document.querySelector('button[aria-label="Delete item"]').addEventListener('click', () => (out.textContent = 'Delete icon button clicked'));
+
+      // Checkboxes
+      const fruits = $$('input[name="fruit"]:not(:disabled)');
+      const selectAll = $('#select-all');
+      function updateCheckboxes() {
+        const checked = fruits.filter((f) => f.checked);
+        selectAll.checked = checked.length === fruits.length;
+        selectAll.indeterminate = checked.length > 0 && checked.length < fruits.length;
+        const options = $$('#no-id-checkboxes input').map((c, i) => c.checked ? (c.getAttribute('aria-label') || 'Option ' + (i + 1)) : null).filter(Boolean);
+        const switches = $$('input[role="switch"]').map((s) => `${s.id.replace('switch-', '')}=${s.checked ? 'on' : 'off'}`);
+        $('#checkbox-output').textContent =
+          `Fruits: ${checked.map((c) => c.value).join(', ') || 'none'}\nOptions: ${options.join(', ') || 'none'}\nSwitches: ${switches.join(', ')}`;
+      }
+      selectAll.addEventListener('change', () => { fruits.forEach((f) => (f.checked = selectAll.checked)); updateCheckboxes(); });
+      $('#checkboxes').addEventListener('change', updateCheckboxes);
+      updateCheckboxes();
+
+      // Radios
+      function updateRadios() {
+        const b = document.querySelector('input[name="browser"]:checked');
+        const l = document.querySelector('input[name="level"]:checked');
+        $('#radio-output').textContent = `Browser: ${b ? b.value : 'none'}\nLevel: ${l ? l.value : 'none'}`;
+      }
+      $('#radios').addEventListener('change', updateRadios);
+      updateRadios();
+
+      // Selects
+      let customValue = '';
+      function updateSelects() {
+        const multi = Array.from($('#multi-select').selectedOptions).map((o) => o.value);
+        $('#select-output').textContent =
+          `Car: ${$('#single-select').value || 'none'}\nCity: ${$('#grouped-select').value}\nLanguages: ${multi.join(', ') || 'none'}\nColour: ${customValue || 'none'}\nCountry: ${$('#autocomplete-input').value || 'none'}\nFramework: ${$('#datalist-input').value || 'none'}`;
+      }
+      ['single-select', 'grouped-select', 'multi-select'].forEach((id) => $('#' + id).addEventListener('change', updateSelects));
+      $('#datalist-input').addEventListener('input', updateSelects);
+
+      const trigger = $('#custom-select-trigger');
+      const optionsList = $('#custom-select-options');
+      function toggleCustom(open) {
+        optionsList.classList.toggle('hidden', !open);
+        trigger.setAttribute('aria-expanded', open);
+      }
+      trigger.addEventListener('click', (e) => { e.stopPropagation(); toggleCustom(optionsList.classList.contains('hidden')); });
+      optionsList.addEventListener('click', (e) => {
+        const li = e.target.closest('li[role="option"]');
+        if (!li) return;
+        $$('li', optionsList).forEach((o) => o.setAttribute('aria-selected', o === li));
+        customValue = li.dataset.value;
+        $('#custom-select-value').textContent = li.textContent;
+        toggleCustom(false);
+        updateSelects();
+      });
+      document.addEventListener('click', () => toggleCustom(false));
+
+      const countries = ['Argentina', 'Australia', 'Austria', 'Belgium', 'Brazil', 'Canada', 'China', 'Denmark', 'Egypt', 'Finland', 'France', 'Germany', 'Greece', 'India', 'Ireland', 'Italy', 'Japan', 'Mexico', 'Netherlands', 'Norway', 'Poland', 'Portugal', 'Romania', 'Russia', 'Spain', 'Sweden', 'Switzerland', 'Turkey', 'United Kingdom', 'United States'];
+      const ac = $('#autocomplete-input');
+      const acList = $('#autocomplete-list');
+      function closeAc() { acList.classList.add('hidden'); ac.setAttribute('aria-expanded', 'false'); }
+      ac.addEventListener('input', () => {
+        const v = ac.value.trim().toLowerCase();
+        const matches = v ? countries.filter((c) => c.toLowerCase().startsWith(v)) : [];
+        acList.innerHTML = matches.map((c, i) => `<li role="option" id="ac-option-${i}" data-value="${c}">${c}</li>`).join('');
+        acList.classList.toggle('hidden', !matches.length);
+        ac.setAttribute('aria-expanded', !!matches.length);
+        updateSelects();
+      });
+      ac.addEventListener('keydown', (e) => {
+        const items = $$('li', acList);
+        if (!items.length || acList.classList.contains('hidden')) return;
+        let idx = items.findIndex((li) => li.classList.contains('active'));
+        if (e.key === 'ArrowDown') { e.preventDefault(); idx = (idx + 1) % items.length; }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); idx = (idx - 1 + items.length) % items.length; }
+        else if (e.key === 'Enter' && idx >= 0) { e.preventDefault(); ac.value = items[idx].dataset.value; closeAc(); updateSelects(); return; }
+        else if (e.key === 'Escape') { closeAc(); return; }
+        else return;
+        items.forEach((li, i) => li.classList.toggle('active', i === idx));
+      });
+      acList.addEventListener('mousedown', (e) => {
+        const li = e.target.closest('li');
+        if (li) { e.preventDefault(); ac.value = li.dataset.value; closeAc(); updateSelects(); }
+      });
+      ac.addEventListener('blur', closeAc);
+      updateSelects();
+
+      // Special inputs
+      const specialIds = ['date-input', 'time-input', 'datetime-input', 'month-input', 'week-input', 'color-input', 'range-input'];
+      function updateSpecial() {
+        $('#range-value').textContent = $('#range-input').value;
+        $('#special-output').textContent = specialIds.map((id) => `${id}: ${$('#' + id).value}`).join('\n');
+      }
+      specialIds.forEach((id) => $('#' + id).addEventListener('input', updateSpecial));
+      updateSpecial();
+
+      // File upload
+      function showFiles(e) {
+        const files = Array.from(e.target.files);
+        $('#upload-output').textContent = files.length
+          ? `${e.target.id}: ` + files.map((f) => `${f.name} (${f.size} bytes, ${f.type || 'unknown type'})`).join('\n')
+          : 'No file selected';
+        if (e.target.id === 'hidden-file' && files[0]) $('#hidden-file-label').textContent = '📎 ' + files[0].name;
+      }
+      ['single-file', 'multi-file', 'hidden-file'].forEach((id) => $('#' + id).addEventListener('change', showFiles));
+
+      // Links
+      $('#js-link').addEventListener('click', (e) => { e.preventDefault(); $('#js-link-output').textContent = '← JavaScript link was clicked'; });
+
+      // Locator challenges
+      $('#user-cards').addEventListener('click', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        const name = btn.closest('.user-card').querySelector('h3').textContent;
+        $('#challenge-output').textContent = `${btn.textContent} clicked for ${name}`;
+      });
+
+      // Images
+      const ctx = $('#canvas').getContext('2d');
+      ctx.fillStyle = '#e8590c'; ctx.fillRect(10, 10, 80, 80);
+      ctx.fillStyle = '#fff'; ctx.font = '16px sans-serif'; ctx.fillText('Canvas', 22, 56);
+      $('#check-images').addEventListener('click', () => {
+        const broken = $$('#images img').filter((img) => img.complete && img.naturalWidth === 0);
+        $('#broken-count').textContent = ` ${broken.length} broken image(s) found`;
+      });
+
+      // Practice form
+      $('#student-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const data = {};
+        for (const [k, v] of fd.entries()) {
+          if (data[k]) data[k] = [].concat(data[k], v); else data[k] = v;
+        }
+        $('#form-output').textContent = JSON.stringify(data, null, 2);
+      });
+      $('#student-form').addEventListener('reset', () => { $('#form-output').textContent = 'Form was reset'; });
+    })();
+  </script>
+</body>
+</html>
