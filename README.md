@@ -12,6 +12,7 @@ Practice with Selenium, Playwright, Cypress, WebdriverIO or any other UI automat
 ![JavaScript](https://img.shields.io/badge/Vanilla_JS-F7DF1E?logo=javascript&logoColor=black)
 ![No build step](https://img.shields.io/badge/build-none-brightgreen)
 ![No backend](https://img.shields.io/badge/backend-none-brightgreen)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 [**🚀 Open the live site**](https://auto-test-site.vercel.app) · [Features](#-features) · [Test accounts](#-test-accounts) · [Test data](#-test-data) · [Example tests](#-example-tests) · [Run locally](#-run-locally)
 
@@ -363,6 +364,12 @@ New challenges are welcome. If you have an automation scenario that's hard to pr
 2. Add your feature to the matching playground page, or create a new page and link it from `PLAYGROUND` in `assets/js/common.js`.
 3. Give interactive elements a `data-testid`, unless the point of the exercise is to have none.
 4. Open a PR describing what it lets people practise.
+
+---
+
+## 📄 License
+
+Released under the [MIT License](LICENSE). Use it, fork it, and build on it for courses, workshops or your own practice.
 
 ---
 
